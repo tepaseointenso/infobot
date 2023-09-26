@@ -40,7 +40,6 @@ internal class TemiSdkServiceConnection {
         @SuppressLint("LongLogTag")
         override fun onServiceDisconnected(name: ComponentName) {
             Log.d(TAG, "onServiceDisconnected(ComponentName) (name=$name)")
-            forceStop()
         }
     }
 
@@ -65,14 +64,8 @@ internal class TemiSdkServiceConnection {
             }
             else -> {
                 Log.w(TAG, "bindService=false")
-                forceStop()
             }
         }
     }
 
-    @SuppressLint("LongLogTag")
-    private fun forceStop() {
-        Log.d(TAG, "forceStop()")
-        Process.killProcess(Process.myPid())
-    }
 }

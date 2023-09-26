@@ -1,13 +1,10 @@
-package com.robotemi.sdk.sample
+package com.seotepa.infobotApp
 
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.util.Log
 import android.widget.Toast
-import com.robotemi.sdk.BatteryData
-import com.robotemi.sdk.Robot
-import com.robotemi.sdk.listeners.OnRobotReadyListener
 
 
 /**

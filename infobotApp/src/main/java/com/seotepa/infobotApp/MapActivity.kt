@@ -1,12 +1,10 @@
-package com.robotemi.sdk.sample
+package com.seotepa.infobotApp
 
-import android.content.ContentValues
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
-import android.os.Environment
 import android.os.ParcelFileDescriptor
 import android.text.method.ScrollingMovementMethod
 import android.util.Log
@@ -19,7 +17,7 @@ import androidx.lifecycle.lifecycleScope
 import com.robotemi.sdk.Robot
 import com.robotemi.sdk.map.MapDataModel
 import com.robotemi.sdk.navigation.model.Position
-import kotlinx.android.synthetic.main.activity_map.*
+import com.seotepa.infobotApp.databinding.ActivityMapBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.File
@@ -45,17 +43,19 @@ class MapActivity : AppCompatActivity() {
 
     private val singleThreadExecutor: ExecutorService = Executors.newSingleThreadExecutor()
 
+    private lateinit var bindingMap: ActivityMapBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_map)
-        ibBack.setOnClickListener { finish() }
-        textViewMapElements.setOnClickListener { refreshMap() }
-        textViewMapElements.movementMethod = ScrollingMovementMethod()
+        bindingMap = ActivityMapBinding.inflate(layoutInflater)
+        setContentView(bindingMap.root)
+        bindingMap.ibBack.setOnClickListener { finish() }
+        bindingMap.textViewMapElements.setOnClickListener { refreshMap() }
+        bindingMap.textViewMapElements.movementMethod = ScrollingMovementMethod()
 
-        buttonBackupMap.setOnClickListener {
+        bindingMap.buttonBackupMap.setOnClickListener {
             // This code block will take current map from temi and create a backup file as ParcelFileDescriptor
             // Write the file to a desired location to finish the backup
-            val withoutUI = checkBoxLoadMapWithoutUI.isChecked
+            val withoutUI = bindingMap.checkBoxLoadMapWithoutUI.isChecked
             val parcelFileDescriptor =
                 Robot.getInstance().getCurrentMapBackupFile(withoutUI) ?: return@setOnClickListener
             lifecycleScope.launch(Dispatchers.IO) {
@@ -86,7 +86,7 @@ class MapActivity : AppCompatActivity() {
             }
         }
 
-        buttonLoadMapFromPrivateFile.setOnClickListener {
+        bindingMap.buttonLoadMapFromPrivateFile.setOnClickListener {
             // This code block will load a map backup to temi.
             // The backup files are taken from either application's internal storage or external storage.
             // These files are securely store this way and transferred by content provider that only temi launcher can read.
@@ -126,7 +126,7 @@ class MapActivity : AppCompatActivity() {
                         }
                 } else {
                     builder.setTitle("No map backup files found")
-                        .setMessage("This sample takes map files from\n/sdcard/Android/data/com.robotemi.sdk.sample/files/maps/\nand /data/data/com.robotemi.sdk.sample/files/maps/")
+                        .setMessage("This sample takes map files from\n/sdcard/Android/data/com.seotepa.infobotApp/files/maps/\nand /data/data/com.robotemi.sdk.sample/files/maps/")
                         .setNegativeButton("Cancel") { dialog, _ ->
                             dialog.dismiss()
                         }
@@ -138,7 +138,7 @@ class MapActivity : AppCompatActivity() {
             }
         }
 
-        buttonLoadMapFromFileSelector.setOnClickListener {
+        bindingMap.buttonLoadMapFromFileSelector.setOnClickListener {
             // This code block is launching a file picker to select a public accessible backup file.
             // So if you app is loaded in the USB drive on V3 robot, this could be an easy way to load it.
 
@@ -150,7 +150,7 @@ class MapActivity : AppCompatActivity() {
             startActivityForResult(intent, REQUEST_FILE_PICKER)
         }
 
-        buttonLoadMapFromPublicFile.setOnClickListener {
+        bindingMap.buttonLoadMapFromPublicFile.setOnClickListener {
             // This is possible but not recommended.
             // As Android doesn't recommend to use file:// scheme to send files.
             val file = File("/sdcard/map-1690428181150.tar.gz")
@@ -165,7 +165,7 @@ class MapActivity : AppCompatActivity() {
     }
 
     private fun refreshMap() {
-        progressBar.visibility = View.VISIBLE
+        bindingMap.progressBar.visibility = View.VISIBLE
         singleThreadExecutor.execute {
             mapDataModel = Robot.getInstance().getMapData() ?: return@execute
             val mapImage = mapDataModel!!.mapImage
@@ -178,23 +178,23 @@ class MapActivity : AppCompatActivity() {
                 Bitmap.Config.ARGB_8888
             )
             runOnUiThread {
-                progressBar.visibility = View.GONE
-                buttonBackupMap.visibility = View.VISIBLE
-                buttonLoadMapFromPrivateFile.visibility = View.VISIBLE
-                buttonLoadMapFromFileSelector.visibility = View.VISIBLE
-                textViewMapElements.text = ""
+                bindingMap.progressBar.visibility = View.GONE
+                bindingMap.buttonBackupMap.visibility = View.VISIBLE
+                bindingMap.buttonLoadMapFromPrivateFile.visibility = View.VISIBLE
+                bindingMap.buttonLoadMapFromFileSelector.visibility = View.VISIBLE
+                bindingMap.textViewMapElements.text = ""
                 Log.i("Map-mapId", mapDataModel!!.mapId)
-                textViewMapElements.append("[map_id]: ${mapDataModel!!.mapId} \n")
+                bindingMap.textViewMapElements.append("[map_id]: ${mapDataModel!!.mapId} \n")
                 Log.i("Map-mapInfo", mapDataModel!!.mapInfo.toString())
-                textViewMapElements.append("[map_info]: ${mapDataModel!!.mapInfo} \n")
+                bindingMap.textViewMapElements.append("[map_info]: ${mapDataModel!!.mapInfo} \n")
                 Log.i("Map-greenPaths", mapDataModel!!.greenPaths.toString())
-                textViewMapElements.append("[map_green_path]: ${mapDataModel!!.greenPaths} \n")
+                bindingMap.textViewMapElements.append("[map_green_path]: ${mapDataModel!!.greenPaths} \n")
                 Log.i("Map-virtualWalls", mapDataModel!!.virtualWalls.toString())
-                textViewMapElements.append("[map_virtual_walls]: ${mapDataModel!!.virtualWalls} \n")
+                bindingMap.textViewMapElements.append("[map_virtual_walls]: ${mapDataModel!!.virtualWalls} \n")
                 Log.i("Map-locations", mapDataModel!!.locations.toString())
-                textViewMapElements.append("[map_locations]: ${mapDataModel!!.locations} \n")
-                textViewMapElements.append("[map_name]: ${mapDataModel!!.mapName} \n")
-                imageViewMap.setImageBitmap(bitmap)
+                bindingMap.textViewMapElements.append("[map_locations]: ${mapDataModel!!.locations} \n")
+                bindingMap.textViewMapElements.append("[map_name]: ${mapDataModel!!.mapName} \n")
+                bindingMap.imageViewMap.setImageBitmap(bitmap)
             }
         }
     }
@@ -226,9 +226,9 @@ class MapActivity : AppCompatActivity() {
      * They function the same as [Robot.loadMap]
      */
     private fun loadMap(uri: Uri) {
-        val reposeRequired = checkBoxLoadMapWithRepose.isChecked
-        val withoutUI = checkBoxLoadMapWithoutUI.isChecked
-        val position: Position? = if (checkBoxLoadMapFromPose.isChecked) {
+        val reposeRequired = bindingMap.checkBoxLoadMapWithRepose.isChecked
+        val withoutUI = bindingMap.checkBoxLoadMapWithoutUI.isChecked
+        val position: Position? = if (bindingMap.checkBoxLoadMapFromPose.isChecked) {
             Position(1f, 1f, 1f)
         } else {
             null

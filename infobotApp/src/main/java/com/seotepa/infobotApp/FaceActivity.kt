@@ -1,4 +1,4 @@
-package com.robotemi.sdk.sample
+package com.seotepa.infobotApp
 
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -16,7 +16,8 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import androidx.lifecycle.lifecycleScope
-import kotlinx.android.synthetic.main.activity_face.*
+import com.seotepa.infobotApp.databinding.ActivityFaceBinding
+import com.seotepa.infobotApp.BuildConfig
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.File
@@ -31,43 +32,45 @@ class FaceActivity : AppCompatActivity() {
         private const val AUTHORITY = "${BuildConfig.APPLICATION_ID}.provider"
     }
 
+    private lateinit var bindingFace: ActivityFaceBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_face)
-        ibBack.setOnClickListener { finish() }
+        bindingFace = ActivityFaceBinding.inflate(layoutInflater)
+        setContentView(bindingFace.root)
+        bindingFace.ibBack.setOnClickListener { finish() }
 
 
-        btnInsertFromLocalFile.setOnClickListener {
+        bindingFace.btnInsertFromLocalFile.setOnClickListener {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 insertFromLocalFile()
             }
         }
 
-        btnInsertFromUrl.setOnClickListener {
+        bindingFace.btnInsertFromUrl.setOnClickListener {
             insertFromUrl()
         }
 
-        btnGetAllFaces.setOnClickListener {
+        bindingFace.btnGetAllFaces.setOnClickListener {
             queryAllFacesRegistered()
         }
 
-        btnGetAllFacesOfUid.setOnClickListener {
+        bindingFace.btnGetAllFacesOfUid.setOnClickListener {
 //            queryAllFacesRegistered("uid = ?", arrayOf("0"))
 //            queryAllFacesRegistered("uid IN (?,?)", arrayOf("0", "2"))
 //            queryAllFacesRegistered("username = ?", arrayOf("Jane Doe"))
             queryAllFacesRegistered("username LIKE ?", arrayOf("%Ja%")) // username contains Ja
         }
 
-        btnDeleteAllFaces.setOnClickListener {
+        bindingFace.btnDeleteAllFaces.setOnClickListener {
             deleteAll()
         }
 
-        btnDeleteAllFacesByUid.setOnClickListener {
+        bindingFace.btnDeleteAllFacesByUid.setOnClickListener {
             deleteAllByUid("1", "2")
             deleteAllByUsername("Jane Doe")
         }
 
-        btnInsertFromCamera.setOnClickListener {
+        bindingFace.btnInsertFromCamera.setOnClickListener {
             val photo = "photo.jpeg"
             val photoFile = File(cacheDir, photo)
             val uri = FileProvider.getUriForFile(this, AUTHORITY, photoFile)
@@ -78,13 +81,13 @@ class FaceActivity : AppCompatActivity() {
             }
         }
 
-        btnInsertFromPhotoLibrary.setOnClickListener {
+        bindingFace.btnInsertFromPhotoLibrary.setOnClickListener {
             val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
             intent.type = "image/*"
             startActivityForResult(intent, REQUEST_IMAGE_PICKER)
         }
 
-        btnInsertFromContentProvider.setOnClickListener {
+        bindingFace.btnInsertFromContentProvider.setOnClickListener {
             lifecycleScope.launch(Dispatchers.IO) {
                 val facesDir = File(filesDir, "faces")
                 try {
@@ -127,10 +130,10 @@ class FaceActivity : AppCompatActivity() {
                         null
                     }
                     Log.d("Insert", "$retUri")
-                    tvLog.text = "${System.currentTimeMillis()}: Image set ready"
+                    bindingFace.tvLog.text = "${System.currentTimeMillis()}: Image set ready"
                 } catch (e: IllegalArgumentException) {
                     Log.e("Insert", "Insert Exception", e)
-                    tvLog.text = "${System.currentTimeMillis()}: Image set failed"
+                    bindingFace.tvLog.text = "${System.currentTimeMillis()}: Image set failed"
                 }
             }
         }
@@ -143,7 +146,7 @@ class FaceActivity : AppCompatActivity() {
             if (imageBitmap != null) {
                 // Thumbnail will not be null if you doesn't set takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, uri)
                 val drawable = BitmapDrawable(imageBitmap)
-                tvLog.background = drawable
+                bindingFace.tvLog.background = drawable
             }
 
             val photo = "photo.jpeg"
@@ -159,10 +162,10 @@ class FaceActivity : AppCompatActivity() {
             contentValues.put("uri", uri.toString())
             try {
                 val retUri = contentResolver.insert(Uri.parse("content://com.robotemi.sdk.TemiSdkDocumentContentProvider/face"), contentValues)
-                tvLog.text = "${System.currentTimeMillis()}: Image set ready from camera"
+                bindingFace.tvLog.text = "${System.currentTimeMillis()}: Image set ready from camera"
             } catch (e: IllegalArgumentException) {
                 Log.e("Insert", "Insert Exception", e)
-                tvLog.text = "${System.currentTimeMillis()}: Image set failed from camera"
+                bindingFace.tvLog.text = "${System.currentTimeMillis()}: Image set failed from camera"
             }
         } else if (requestCode == REQUEST_IMAGE_PICKER && resultCode == Activity.RESULT_OK) {
             Log.d("Picker", "$data")
@@ -175,10 +178,10 @@ class FaceActivity : AppCompatActivity() {
             grantUriPermission("com.robotemi.face", uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
             try {
                 val retUri = contentResolver.insert(Uri.parse("content://com.robotemi.sdk.TemiSdkDocumentContentProvider/face"), contentValues)
-                tvLog.text = "${System.currentTimeMillis()}: Image set ready from gallery"
+                bindingFace.tvLog.text = "${System.currentTimeMillis()}: Image set ready from gallery"
             } catch (e: IllegalArgumentException) {
                 Log.e("Insert", "Insert Exception", e)
-                tvLog.text = "${System.currentTimeMillis()}: Image set failed from gallery"
+                bindingFace.tvLog.text = "${System.currentTimeMillis()}: Image set failed from gallery"
             }
         }
     }
@@ -197,10 +200,10 @@ class FaceActivity : AppCompatActivity() {
             try {
                 val retUri = contentResolver.insert(Uri.parse("content://com.robotemi.sdk.TemiSdkDocumentContentProvider/face"), contentValues)
                 Log.d("Insert", "$retUri")
-                tvLog.text = "${System.currentTimeMillis()}: Image set ready"
+                bindingFace.tvLog.text = "${System.currentTimeMillis()}: Image set ready"
             } catch (e: IllegalArgumentException) {
                 Log.e("Insert", "Insert Exception", e)
-                tvLog.text = "${System.currentTimeMillis()}: Image set failed"
+                bindingFace.tvLog.text = "${System.currentTimeMillis()}: Image set failed"
             }
         }
     }
@@ -223,10 +226,10 @@ class FaceActivity : AppCompatActivity() {
         try {
             val retUri = contentResolver.insert(Uri.parse("content://com.robotemi.sdk.TemiSdkDocumentContentProvider/face"), contentValues, bundle)
             Log.d("Insert", "$retUri")
-            tvLog.text = "${System.currentTimeMillis()}: Image set ready"
+            bindingFace.tvLog.text = "${System.currentTimeMillis()}: Image set ready"
         } catch (e: IllegalArgumentException) {
             Log.e("Insert", "Insert Exception", e)
-            tvLog.text = "${System.currentTimeMillis()}: Image set failed"
+            bindingFace.tvLog.text = "${System.currentTimeMillis()}: Image set failed"
         }
     }
 
@@ -278,7 +281,7 @@ class FaceActivity : AppCompatActivity() {
                     counter++
                 }
                 cursor.close()
-                tvLog.text = string
+                bindingFace.tvLog.text = string
                 Log.d("Query", "$indexOrUserName, $colCount")
             }
 

@@ -1,4 +1,4 @@
-package com.robotemi.sdk.sample
+package com.seotepa.infobotApp
 
 import android.content.BroadcastReceiver
 import android.content.Context
