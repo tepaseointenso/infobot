@@ -1999,11 +1999,3 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
         printLog("onRobotDragStateChanged $isDragged")
     }
 }
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    SdkTheme {
-        AppNavigation()
-    }
-}

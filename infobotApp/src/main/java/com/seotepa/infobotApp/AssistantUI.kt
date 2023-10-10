@@ -23,9 +23,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.Wallpapers
 import androidx.compose.ui.unit.dp
-import com.seotepa.infobotApp.buttons.buttonLabels
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.seotepa.infobotApp.buttons.buttonLabels
 import com.seotepa.infobotApp.navigation.AppScreens
 import com.seotepa.infobotApp.ui.theme.SdkTheme
 
@@ -82,7 +82,7 @@ fun AssistantUI(navController: NavController
                         row.forEach { label ->
                             Button(
                                 onClick = {
-                                    navController.navigate(route = AppScreens.UbicacionScreen.route)
+                                    navController.navigate(route = AppScreens.CarrerasScreen.route)
                                 },
                                 modifier = Modifier
                                     .padding(8.dp)
