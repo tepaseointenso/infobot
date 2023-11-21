@@ -33,10 +33,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.app.ActivityCompat
+import androidx.lifecycle.ViewModelProvider
 import com.google.gson.Gson
 import com.robotemi.sdk.*
 import com.robotemi.sdk.Robot.*
@@ -66,6 +65,12 @@ import com.robotemi.sdk.navigation.model.SafetyLevel
 import com.robotemi.sdk.navigation.model.SpeedLevel
 import com.robotemi.sdk.permission.OnRequestPermissionResultListener
 import com.robotemi.sdk.permission.Permission
+import com.robotemi.sdk.sequence.OnSequencePlayStatusChangedListener
+import com.robotemi.sdk.sequence.SequenceModel
+import com.robotemi.sdk.telepresence.CallState
+import com.robotemi.sdk.telepresence.Participant
+import com.robotemi.sdk.voice.ITtsService
+import com.robotemi.sdk.voice.model.TtsVoice
 import com.seotepa.infobotApp.databinding.ActivityFaceBinding
 import com.seotepa.infobotApp.databinding.ActivityMainBinding
 import com.seotepa.infobotApp.databinding.GroupAppAndPermissionBinding
@@ -73,21 +78,16 @@ import com.seotepa.infobotApp.databinding.GroupButtonsBinding
 import com.seotepa.infobotApp.databinding.GroupMapAndMovementBinding
 import com.seotepa.infobotApp.databinding.GroupSettingsAndStatusBinding
 import com.seotepa.infobotApp.navigation.AppNavigation
-import com.robotemi.sdk.sequence.OnSequencePlayStatusChangedListener
-import com.robotemi.sdk.sequence.SequenceModel
-import com.robotemi.sdk.telepresence.CallState
-import com.robotemi.sdk.telepresence.Participant
-import com.robotemi.sdk.voice.ITtsService
-import com.robotemi.sdk.voice.model.TtsVoice
+import com.seotepa.infobotApp.navigation.AppScreens
+import com.seotepa.infobotApp.ui.theme.SdkTheme
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import java.util.*
 import java.util.concurrent.Executors
-import com.seotepa.infobotApp.ui.theme.SdkTheme
 
 
-class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
+class MainActivity : AppCompatActivity(), NlpListener,OnRobotReadyListener,
     ConversationViewAttachesListener, WakeupWordListener, ActivityStreamPublishListener,
     TtsListener, OnBeWithMeStatusChangedListener, OnGoToLocationStatusChangedListener,
     OnLocationsUpdatedListener, OnConstraintBeWithStatusChangedListener,
@@ -113,6 +113,8 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
 
     private val assistantReceiver = AssistantChangeReceiver()
 
+    private var ttsStatus: TtsRequest? = null
+
 
     private val telepresenceStatusChangedListener: OnTelepresenceStatusChangedListener by lazy {
         object : OnTelepresenceStatusChangedListener("") {
@@ -129,14 +131,17 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
     private lateinit var bindingGroupSettingsStatus: GroupSettingsAndStatusBinding
     private lateinit var bindingMapMovement: GroupMapAndMovementBinding
     private lateinit var bindingAppPermissions: GroupAppAndPermissionBinding
+    private lateinit var sharedViewModel: SharedViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        bindingMain = ActivityMainBinding.inflate(layoutInflater)
+        sharedViewModel = ViewModelProvider(this).get(SharedViewModel::class.java)
         setContent {
             SdkTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-                    AppNavigation()
+                    AppNavigation(sharedViewModel = sharedViewModel)
                 }
             }
         }
@@ -476,7 +481,7 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
     }
 
     private fun getNickName() {
-        printLog("temi's nick name: ${robot.getNickName()}")
+        speak("temi's nick name: ${robot.getNickName()}")
     }
 
     private fun toggleHardBtnVolume() {
@@ -576,27 +581,14 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
     /**
      * Have the robot speak while displaying what is being said.
      */
-    private fun speak() {
-        val text = bindingMain.etSpeak.text.toString()
+    private fun speak(text: String) {
         val languages = ArrayList<TtsRequest.Language>()
         TtsRequest.Language.values().forEach {
             language ->  languages.add(language)
         }
-        val adapter = ArrayAdapter(this, R.layout.item_dialog_row, R.id.name, languages)
-        val dialog = AlertDialog.Builder(this)
-            .setTitle("Select Speaking Language")
-            .setAdapter(adapter, null)
-            .create()
-        dialog.listView.onItemClickListener =
-            OnItemClickListener { _: AdapterView<*>?, _: View?, position: Int, _: Long ->
-                val ttsRequest =
-                    create(text, language = adapter.getItem(position)!!, showAnimationOnly = true)
-                robot.speak(ttsRequest)
-                printLog("Speak: ${adapter.getItem(position)}")
-                dialog.dismiss()
-            }
-        dialog.show()
-        hideKeyboard()
+        val ttsRequest =
+            create(text, language = TtsRequest.Language.ES_ES, showAnimationOnly = true)
+        robot.speak(ttsRequest)
     }
 
     /**
@@ -860,8 +852,8 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
     }
 
     override fun onTtsStatusChanged(ttsRequest: TtsRequest) {
-        // Do whatever you like upon the status changing. after the robot finishes speaking
         printLog("onTtsStatusChanged: $ttsRequest")
+        ttsStatus = ttsRequest
     }
 
     override fun onBeWithMeStatusChanged(status: String) {
@@ -940,6 +932,8 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
      *
      * @param asrResult The result of the ASR after waking up temi.
     </pre></pre> */
+
+
     override fun onAsrResult(asrResult: String) {
         printLog("onAsrResult", "asrResult = $asrResult")
         try {
@@ -953,32 +947,112 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
             return
         }
         when {
-            asrResult.equals("Hello", ignoreCase = true) -> {
-                robot.askQuestion("Hello, I'm temi, what can I do for you?")
+            asrResult.equals("Hola", ignoreCase = true) -> {
+                robot.askQuestion("Hola, soy el infoBot de la PUCV, en que puedo ayudarte?")
             }
-            asrResult.equals("Play music", ignoreCase = true) -> {
+
+            asrResult.contains(
+                "Muestrame la lista de profesores",
+                ignoreCase = true
+            ) || asrResult.contains("Lista de profesores", ignoreCase = true)
+                    || asrResult.contains(
+                "Profesores",
+                ignoreCase = true
+            ) || asrResult.contains("¿Cuales son los profesores?", ignoreCase = true) -> {
                 robot.finishConversation()
-                robot.speak(create("Okay, please enjoy.", false))
-                playMusic()
+                sharedViewModel.navController.value?.navigate(AppScreens.AcademicosScreen.route)
+                robot.speak(
+                    create(
+                        "Estos son los académicos que imparten alguna asignatura o doctorado en la escuela de ingeniería informatica de la PUCV",
+                        false
+                    )
+                )
             }
-            asrResult.equals("Play movie", ignoreCase = true) -> {
+
+            asrResult.contains("carreras",true)-> {
                 robot.finishConversation()
-                robot.speak(create("Okay, please enjoy.", false))
-                playMovie()
+                sharedViewModel.navController.value?.navigate(AppScreens.CarrerasScreen.route)
+                robot.speak(
+                    create(
+                        "Estas son las carreras y doctorados que actualmente se imparten en la escuela de ingeniería informatica de la PUCV",
+                        false
+                    )
+                )
             }
-            asrResult.lowercase().contains("follow me") -> {
+
+            asrResult.contains("Sígueme",true) || asrResult.contains("seguir", true) -> {
                 robot.finishConversation()
                 robot.beWithMe()
+                robot.speak(
+                    create(
+                        "De acuerdo",
+                        false
+                    )
+                )
             }
+
+            asrResult.contains("mírame",true) || asrResult.contains("mirar", true) -> {
+                robot.finishConversation()
+                robot.constraintBeWith()
+                robot.speak(
+                    create(
+                        "De acuerdo",
+                        false
+                    )
+                )
+            }
+
+            asrResult.contains("para de moverte",true) || asrResult.contains("detener", true) -> {
+                robot.finishConversation()
+                robot.stopMovement()
+                robot.speak(
+                    create(
+                        "De acuerdo, dejaré de moverme",
+                        false
+                    )
+                )
+            }
+
             asrResult.lowercase().contains("go to home base") -> {
                 robot.finishConversation()
                 robot.goTo("home base")
             }
+
+            asrResult.lowercase().contains("Deja de seguirme",true) -> {
+                robot.finishConversation()
+                robot.speak(
+                    create(
+                        "Ya bueno, pero no te enojes",
+                        false
+                    )
+                )
+                robot.stopMovement()
+
+            }
+
             else -> {
-                robot.askQuestion("Sorry I can't understand you, could you please ask something else?")
+                val ttsStatusListener = object : TtsListener {
+                    override fun onTtsStatusChanged(ttsRequest: TtsRequest) {
+                        if (ttsRequest.status == TtsRequest.Status.COMPLETED){
+                            printLog("ESTADO SE COMPLETO", "status = $ttsRequest")
+
+                            robot.askQuestion("¿En que puedo ayudarte?")
+                            robot.removeTtsListener(this)
+                        }
+                    }
+                }
+
+                robot.addTtsListener(ttsStatusListener)
+                robot.speak(
+                    create(
+                        "Lo siento no he entendido tu pregunta",
+                        showAnimationOnly = true
+                    )
+                )
             }
         }
     }
+
 
     private fun playMovie() {
         // Play movie...
@@ -1998,4 +2072,5 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
     override fun onRobotDragStateChanged(isDragged: Boolean) {
         printLog("onRobotDragStateChanged $isDragged")
     }
+
 }

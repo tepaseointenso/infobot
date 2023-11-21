@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
@@ -26,7 +27,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.seotepa.infobotApp.buttons.buttonLabels
-import com.seotepa.infobotApp.navigation.AppScreens
 import com.seotepa.infobotApp.ui.theme.SdkTheme
 
 @Composable
@@ -81,9 +81,7 @@ fun AssistantUI(navController: NavController
                     ) {
                         row.forEach { label ->
                             Button(
-                                onClick = {
-                                    navController.navigate(route = AppScreens.CarrerasScreen.route)
-                                },
+                                onClick = { BotFunctions.askQuestion() },
                                 modifier = Modifier
                                     .padding(8.dp)
                                     .weight(1f)
@@ -99,6 +97,20 @@ fun AssistantUI(navController: NavController
                 }
             }
 
+        }
+        Button(
+            onClick = { BotFunctions.askQuestion() },
+            modifier = Modifier
+                .align(Alignment.BottomStart)  // Posiciona el botón en la esquina inferior izquierda
+                .height(200.dp)  // Establece la altura del botón
+                .width(400.dp)
+                .padding(16.dp)
+        ) {
+            Text(
+                text = "Pregunta ahora",
+                style = MaterialTheme.typography.bodyMedium,
+                color = Color.White
+            )
         }
     }
 }

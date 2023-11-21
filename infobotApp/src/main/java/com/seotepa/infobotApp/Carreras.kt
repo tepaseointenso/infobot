@@ -179,7 +179,7 @@ fun TarjetaCarrera(carrera: Carrera) {
 
 @Composable
 fun CarrerasRow(){
-    Column() {
+    Column(modifier = Modifier.padding(vertical = 26.dp)) {
         Text(
             text = "Carreras disponibles",
             style = MaterialTheme.typography.displayMedium,

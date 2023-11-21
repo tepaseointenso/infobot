@@ -8,15 +8,19 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
@@ -26,15 +30,84 @@ fun GaleriaScreen(navController: NavController) {
 
 
 @Composable
-fun GaleriaContent(navController: NavController){
-    val images = listOf(
-            R.drawable.civil,
-            R.drawable.informatica,
-            R.drawable.datos,
-    )
+fun GaleriaContent(navController: NavController) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
+        Button(
+            onClick = { BotFunctions.speak("PRUEBA DE TEXTO") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp)
+                .height(50.dp)
+        ) {
+            Text(
+                text = "FUNCION PARA HABLAR",
+                style = MaterialTheme.typography.bodyMedium,
+                color = Color.White
+            )
+        }
 
-    ImageGallery(images = images)
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Button(
+            onClick = { BotFunctions.getNickName() },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp)
+                .height(50.dp)
+        ) {
+            Text(
+                text = "NICKNAME ROBOT",
+                style = MaterialTheme.typography.bodyMedium,
+                color = Color.White
+            )
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Button(
+            onClick = { BotFunctions.followMe() },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp)
+                .height(50.dp)
+        ) {
+            Text(
+                text = "SEGUIR",
+                style = MaterialTheme.typography.bodyMedium,
+                color = Color.White
+            )
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Button(
+            onClick = { BotFunctions.askQuestion() },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp)
+                .height(50.dp)
+        ) {
+            Text(
+                text = "PREGUNTAR",
+                style = MaterialTheme.typography.bodyMedium,
+                color = Color.White
+            )
+        }
+
+        // Resto del contenido, como la galería de imágenes
+        // ImageGallery(images = images)
+    }
 }
+
+
+
+
+
+
 @Composable
 fun ImageGallery(images: List<Int>) {
     LazyColumn(

@@ -19,6 +19,7 @@ import androidx.annotation.IntRange
 import androidx.annotation.RestrictTo.Scope.LIBRARY
 import com.google.gson.*
 import com.google.gson.reflect.TypeToken
+import com.robotemi.sdk.TtsRequest.Companion.create
 import com.robotemi.sdk.activitystream.ActivityStreamObject
 import com.robotemi.sdk.activitystream.ActivityStreamPublishMessage
 import com.robotemi.sdk.activitystream.ActivityStreamUtils
@@ -276,6 +277,7 @@ class Robot private constructor(private val context: Context) {
         }
 
         override fun onConversationStatusChanged(status: Int, text: String): Boolean {
+            speak(create("cambio speech"))
             if (onConversationStatusChangedListeners.isEmpty()) return false
             uiHandler.post {
                 for (onConversationStatusChangedListener in onConversationStatusChangedListeners) {
