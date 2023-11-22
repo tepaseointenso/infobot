@@ -8,9 +8,20 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.rounded.GraphicEq
+import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,8 +29,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.seotepa.infobotApp.ui.theme.SofiaSans
 
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -29,77 +43,86 @@ fun GaleriaScreen(navController: NavController) {
 }
 
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GaleriaContent(navController: NavController) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
+    Scaffold(
+        containerColor = MaterialTheme.colorScheme.primaryContainer,
+        topBar = {
+            CenterAlignedTopAppBar(
+                colors = TopAppBarDefaults.smallTopAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                    titleContentColor = MaterialTheme.colorScheme.primary,
+                ),
+                title = {
+                    Text(
+                        "INFOBOT PUCV",
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        style = MaterialTheme.typography.displayLarge,
+                        fontFamily = SofiaSans
+                    )
+                },
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(
+                            imageVector = Icons.Filled.ArrowBack,
+                            tint = Color.White,
+                            contentDescription = "Localized description"
+                        )
+                    }
+                },
+                actions = {
+                    IconButton(onClick = { /* do something */ }) {
+                        Icon(
+                            imageVector = Icons.Filled.Menu,
+                            contentDescription = "Localized description"
+                        )
+                    }
+                },
+            )
+        },
+        bottomBar = {
+            BottomAppBar(
+                containerColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                contentColor = MaterialTheme.colorScheme.primary,
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        Icons.Rounded.GraphicEq,
+                        contentDescription = "Asistente de Voz",
+                        modifier = Modifier.size(size = 120.dp)
+                    )
+                    Button(
+                        onClick = { BotFunctions.askQuestion() }
+                    ) {
+                        Text(
+                            textAlign = TextAlign.Center,
+                            text = "Pregúntame cualquier cosa!",
+                            style = MaterialTheme.typography.headlineLarge,
+                            fontFamily = SofiaSans
+                        )
+
+                    }
+
+
+                }
+            }
+        }
     ) {
-        Button(
-            onClick = { BotFunctions.speak("PRUEBA DE TEXTO") },
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp)
-                .height(50.dp)
+                .fillMaxSize(),
+            verticalArrangement = Arrangement.Center, // Centra verticalmente los elementos
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(
-                text = "FUNCION PARA HABLAR",
-                style = MaterialTheme.typography.bodyMedium,
-                color = Color.White
-            )
+
         }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Button(
-            onClick = { BotFunctions.getNickName() },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp)
-                .height(50.dp)
-        ) {
-            Text(
-                text = "NICKNAME ROBOT",
-                style = MaterialTheme.typography.bodyMedium,
-                color = Color.White
-            )
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Button(
-            onClick = { BotFunctions.followMe() },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp)
-                .height(50.dp)
-        ) {
-            Text(
-                text = "SEGUIR",
-                style = MaterialTheme.typography.bodyMedium,
-                color = Color.White
-            )
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Button(
-            onClick = { BotFunctions.askQuestion() },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp)
-                .height(50.dp)
-        ) {
-            Text(
-                text = "PREGUNTAR",
-                style = MaterialTheme.typography.bodyMedium,
-                color = Color.White
-            )
-        }
-
-        // Resto del contenido, como la galería de imágenes
-        // ImageGallery(images = images)
     }
 }
 

@@ -21,6 +21,7 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.rounded.GraphicEq
 import androidx.compose.material3.BottomAppBar
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -41,11 +42,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.Wallpapers
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.seotepa.infobotApp.ui.theme.SdkTheme
 import com.seotepa.infobotApp.ui.theme.SofiaSans
 
 data class Carrera(val title: String, val image:Int)
@@ -68,7 +66,7 @@ val diplomados = listOf(
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CardList() {
+fun CardList(navController: NavController) {
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.primaryContainer,
@@ -88,7 +86,7 @@ fun CardList() {
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = { /* do something */ }) {
+                    IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
                             imageVector = Icons.Filled.ArrowBack,
                             tint = Color.White,
@@ -121,12 +119,19 @@ fun CardList() {
                         contentDescription = "Asistente de Voz",
                         modifier = Modifier.size(size = 120.dp)
                     )
-                    Text(
-                        textAlign = TextAlign.Center,
-                        text = "Pregúntame cualquier cosa!",
-                        style = MaterialTheme.typography.headlineLarge,
-                        fontFamily = SofiaSans
-                    )
+                    Button(
+                        onClick = { BotFunctions.askQuestion()}
+                    ){
+                        Text(
+                            textAlign = TextAlign.Center,
+                            text = "Pregúntame cualquier cosa!",
+                            style = MaterialTheme.typography.headlineLarge,
+                            fontFamily = SofiaSans
+                        )
+
+                    }
+
+
                 }
             }
         }
@@ -230,14 +235,6 @@ fun DiplomadosRow(){
 
 @Composable
 fun CarrerasScreen(navController: NavController) {
-    CardList()
-}
-
-@Preview(wallpaper = Wallpapers.BLUE_DOMINATED_EXAMPLE, widthDp = 1280)
-@Composable
-fun CardListPreview() {
-    SdkTheme {
-        CardList()
-    }
+    CardList(navController)
 }
 

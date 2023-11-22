@@ -1013,12 +1013,12 @@ class MainActivity : AppCompatActivity(), NlpListener,OnRobotReadyListener,
                 )
             }
 
-            asrResult.lowercase().contains("go to home base") -> {
+            asrResult.contains("go to home base") -> {
                 robot.finishConversation()
                 robot.goTo("home base")
             }
 
-            asrResult.lowercase().contains("Deja de seguirme",true) -> {
+            asrResult.contains("No me sigas",true) -> {
                 robot.finishConversation()
                 robot.speak(
                     create(

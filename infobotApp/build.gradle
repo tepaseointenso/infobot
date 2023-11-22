@@ -15,7 +15,7 @@ android {
     defaultConfig {
         applicationId 'com.seotepa.infobot'
         minSdkVersion 23
-        //noinspection ExpiredTargetSdkVersion,ExpiringTargetSdkVersion
+        //noinspection ExpiredTargetSdkVers2ion,ExpiringTargetSdkVersion
         targetSdkVersion 30
         versionCode 1
         versionName "1.0"
