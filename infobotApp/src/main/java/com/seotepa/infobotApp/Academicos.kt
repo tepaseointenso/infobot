@@ -3,9 +3,9 @@ package com.seotepa.infobotApp
 import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Menu
@@ -35,12 +36,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.seotepa.infobotApp.ui.theme.SdkTheme
@@ -118,7 +121,7 @@ fun AcademicosScreen(navController: NavController) {
                 ),
                 title = {
                     Text(
-                        "INFOBOT PUCV",
+                        "ACADÉMICOS PUCV",
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         style = MaterialTheme.typography.displayLarge,
@@ -143,6 +146,9 @@ fun AcademicosScreen(navController: NavController) {
                     }
                 },
             )
+        },
+        content = {
+            BodyContent(navController, modifier = Modifier.padding(it))
         },
         bottomBar = {
             BottomAppBar(
@@ -175,93 +181,94 @@ fun AcademicosScreen(navController: NavController) {
                 }
             }
         }
-    ) {
-        Column {
-            BodyContent(navController = navController)
-        }
-    }
+    )
 }
 
 
 @Composable
-fun BodyContent(navController: NavController) {
-    Column(modifier = Modifier.padding(vertical = 26.dp)) {
-        LazyColumn {
-            items(profesores.chunked(2)) {
-                    Row(
+fun BodyContent(navController: NavController, modifier: Modifier) {
+    LazyColumn (
+        verticalArrangement = Arrangement.Center,
+        modifier = modifier
+            .fillMaxHeight()
+    ){
+        items(profesores.chunked(2)) { rowOfProfes ->
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp) ,// Ajusta la altura automáticamente si hay solo una fila
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                rowOfProfes.forEach { profesor ->
+                    Column(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween
+                            .weight(1f)
+                            .weight(1f)
+                            .padding(18.dp)
                     ) {
-                        for (profesor in it) {
-                            CardProfesor(profesor = profesor, modifier = Modifier.weight(1f))
-                        }
+                        CardProfesor2(profesor = profesor)
                     }
+                }
             }
         }
     }
 }
 
-
-
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CardProfesor(profesor: Profesor, modifier: Modifier) {
+fun CardProfesor2(profesor: Profesor) {
     Card(
-        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
-        modifier = modifier
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.inverseOnSurface
+        ),
+        onClick = { BotFunctions.speak("${profesor.nombre} es ${profesor.cargo}")},
+        modifier = Modifier
             .fillMaxWidth()
+            .height(250.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
+        shape = RoundedCornerShape(16.dp)
     ) {
-        Row {
-            // Imagen a la izquierda con tamaño fijo y proporciones cuadradas
-            Image(
-                painter = painterResource(id = profesor.image),
-                contentDescription = null,
-                modifier = Modifier
-                    .width(250.dp) // Ancho de la imagen
-                    .height(250.dp) // Altura dinámica para mantener proporciones cuadradas
-            )
-
-            // Contenido de texto a la derecha
-            Column(
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .padding(16.dp)
-            ) {
-                // Texto centrado abajo
-                Text(
-                    text = profesor.nombre,
-                    style = MaterialTheme.typography.headlineMedium,
-                    color = MaterialTheme.colorScheme.inversePrimary,
-                    fontWeight = FontWeight.ExtraBold,
+        Box {
+            Row {
+                // Imagen a la izquierda
+                Image(
+                    painter = painterResource(id = profesor.image),
+                    contentDescription = null,
+                    contentScale = ContentScale.FillHeight,
+                    modifier = Modifier
+                        .width(200.dp) // Ajusta el ancho de la imagen según sea necesario
+                        .fillMaxHeight()
                 )
 
-                // Campo de cargo
-                Spacer(modifier = Modifier.height(8.dp)) // Espacio entre campos
-                Text(
-                    text = "Cargo:",
-                    style = MaterialTheme.typography.headlineSmall,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-                Text(
-                    text = profesor.cargo,
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-
-                // Listado de títulos
-                Spacer(modifier = Modifier.height(8.dp)) // Espacio entre campos
-                Text(
-                    text = "Títulos:",
-                    style = MaterialTheme.typography.headlineSmall,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-                profesor.titulos.forEach { titulo ->
+                Column(
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .weight(1f)
+                ) {
+                    // Texto a la derecha
                     Text(
-                        text = "- $titulo",
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onSurface
+                        text = profesor.nombre,
+                        modifier = Modifier
+                            .padding(bottom = 8.dp) // Margen interno
+                            .fillMaxWidth(),
+                        style = MaterialTheme.typography.displaySmall,
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.ExtraBold,
+                        fontFamily = SofiaSans
                     )
+
+                    // LazyColumn
+                    LazyColumn {
+                        items(profesor.titulos) { titulo ->
+                            Text(
+                                text = titulo,
+                                fontSize = 20.sp,
+                                fontFamily = SofiaSans,
+                                modifier = Modifier
+                                    .padding(8.dp) // Margen interno
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -271,12 +278,13 @@ fun CardProfesor(profesor: Profesor, modifier: Modifier) {
 
 
 
+
 @Preview(widthDp = 1280)
 @Composable
 fun BodyContentPreview() {
     SdkTheme {
         val navController = rememberNavController()
-        BodyContent(navController)
+        AcademicosScreen(navController)
     }
 }
 

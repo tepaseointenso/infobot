@@ -17,12 +17,8 @@ object BotFunctions {
 
 
     // Puedes definir tus funciones aquí
-    fun speak(text: String) {
-        val languages = ArrayList<TtsRequest.Language>()
-        TtsRequest.Language.values().forEach { language ->
-            languages.add(language)
-        }
-        val ttsRequest = create(text, language = TtsRequest.Language.ES_ES, showAnimationOnly = true)
+    fun speak(text: String, showAnimationOnly: Boolean = false) {
+        val ttsRequest = create(text, language = TtsRequest.Language.ES_ES, showAnimationOnly = showAnimationOnly)
         robot.speak(ttsRequest)
     }
 

@@ -1,6 +1,7 @@
 package com.seotepa.infobotApp
 
 import android.annotation.SuppressLint
+import android.app.Application
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -8,13 +9,17 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.rounded.GraphicEq
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
@@ -22,6 +27,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -39,14 +45,15 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.Wallpapers
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.seotepa.infobotApp.navigation.AppScreens
 import com.seotepa.infobotApp.ui.theme.SdkTheme
 import com.seotepa.infobotApp.ui.theme.SofiaSans
 
+
 data class Boton(val text: String, val image:Int, val route:String)
+data class Evaluacion(val estrellas: Int)
 
 val botones = listOf(
     Boton("Profesores", image = R.drawable.civil, route = AppScreens.AcademicosScreen.route),
@@ -54,85 +61,6 @@ val botones = listOf(
     Boton("Doctorados", image = R.drawable.informatica, route = AppScreens.GaleriaScreen.route)
 )
 
-//@Composable
-//fun AssistantUI(navController: NavController
-//) {
-//    Box(
-//        modifier = Modifier.fillMaxSize(),
-//    ) {
-//        // Fondo de imagen
-//        Image(
-//            painter = painterResource(id = R.drawable.background),
-//            contentDescription = null, // Proporciona una descripción adecuada si es necesario
-//            contentScale = ContentScale.FillBounds,
-//            modifier = Modifier
-//                .fillMaxSize()
-//                .blur(50.dp)
-//        )
-//        Card(
-//            modifier = Modifier
-//                .align(Alignment.Center)
-//        ) {
-//            Column(
-//                modifier = Modifier
-//                    .padding(16.dp),
-//                horizontalAlignment = Alignment.CenterHorizontally,
-//                verticalArrangement = Arrangement.Center
-//            ) {
-//                Image(
-//                    painter = painterResource(id = R.drawable.logo_escuela),
-//                    contentDescription = "Logo de la escuela",
-//                    contentScale = ContentScale.Inside,
-//                    modifier = Modifier
-//                        .width(300.dp)
-//                )
-//
-//                BotonesContainer()
-//
-////                val rows = buttonLabels.chunked(3)
-////
-////                rows.forEach { row ->
-////                    Row(
-////                        horizontalArrangement = Arrangement.Center,
-////                        modifier = Modifier.fillMaxWidth(0.8f)
-////                    ) {
-////                        row.forEach { label ->
-////                            Button(
-////                                onClick = { BotFunctions.askQuestion() },
-////                                modifier = Modifier
-////                                    .padding(8.dp)
-////                                    .fillMaxWidth()
-////                                    .height(150.dp) // Adjust the height as needed
-////                                    .weight(1f)
-////                            ) {
-////                                Text(
-////                                    text = label,
-////                                    style = MaterialTheme.typography.bodyMedium,
-////                                    color = Color.White
-////                                )
-////                            }
-////                        }
-////                    }
-////                }
-//            }
-//
-//        }
-//        Button(
-//            onClick = { BotFunctions.askQuestion() },
-//            modifier = Modifier
-//                .align(Alignment.BottomStart)  // Posiciona el botón en la esquina inferior izquierda
-//                .height(200.dp)  // Establece la altura del botón
-//                .width(400.dp)
-//                .padding(16.dp)
-//        ) {
-//            Text(
-//                text = "Pregunta ahora",
-//                style = MaterialTheme.typography.bodyMedium,
-//                color = Color.White
-//            )
-//        }
-//    }
-//}
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -157,6 +85,13 @@ fun AssistantUI(navController: NavController) {
                     )
                 },
             )
+        },
+        content = {
+            Column {
+                BotonesContainer(navController, modifier = Modifier.padding(it))
+
+                // Agrega el Spacer y el botón de evaluación dentro del contenido
+            }
         },
         bottomBar = {
             BottomAppBar(
@@ -189,27 +124,19 @@ fun AssistantUI(navController: NavController) {
                 }
             }
         }
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize(),
-            verticalArrangement = Arrangement.Center, // Centra verticalmente los elementos
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            BotonesContainer(navController)
-//            Divider(thickness = 5.dp, color = MaterialTheme.colorScheme.onPrimaryContainer, modifier = Modifier.padding(vertical = 10.dp))
-        }
-
-    }
+    )
 }
 @Composable
 fun TarjetaBotones(boton: Boton, navController: NavController) {
     Card(
-        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
         modifier = Modifier
-            .clickable(onClick = { navController.navigate(route = boton.route) })
-            .width(500.dp) // Establece el ancho deseado para hacer la tarjeta cuadrada
-            .height(250.dp) // Establece la altura deseada para hacer la tarjeta cuadrada
+            .clickable {
+                navController.navigate(route = boton.route)
+            }
+            .fillMaxWidth()
+            .height(250.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
+        shape = RoundedCornerShape(16.dp)
     ) {
         Box {
             // Imagen de fondo
@@ -220,37 +147,89 @@ fun TarjetaBotones(boton: Boton, navController: NavController) {
                 alpha = 0.4f,
                 modifier = Modifier
                     .background(Color.Black)
+                    .fillMaxSize()
             )
 
             // Texto centrado abajo
             Text(
                 text = boton.text,
                 modifier = Modifier // Centra el texto en la parte inferior
+                    .padding(16.dp) // Margen interno
                     .align(Alignment.Center),
-                fontFamily = SofiaSans,
-                style = MaterialTheme.typography.headlineLarge.copy(fontSize = 48.sp, fontWeight = FontWeight.ExtraBold),
+                style = MaterialTheme.typography.displayLarge,
                 color = MaterialTheme.colorScheme.inversePrimary,
+                fontWeight = FontWeight.ExtraBold,
+                fontFamily = SofiaSans
             )
         }
     }
 }
 
 @Composable
-fun BotonesContainer(navController: NavController){
-    Column(modifier = Modifier.padding(vertical = 26.dp)) {
-        Row (
-            modifier = Modifier
-                .fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceAround,
-        ){
-            botones.forEach() {
-                Column {
-                    TarjetaBotones(boton = it, navController)
+fun BotonesContainer(navController: NavController, modifier: Modifier) {
+    Box(
+        modifier = modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        LazyColumn(
+            verticalArrangement = Arrangement.Center,
+            modifier = Modifier.fillMaxHeight()
+        ) {
+            items(botones.chunked(3)) { rowOfBotones ->
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    rowOfBotones.forEach { boton ->
+                        Column(
+                            modifier = Modifier
+                                .weight(1f)
+                                .padding(8.dp)
+                        ) {
+                            TarjetaBotones(boton = boton, navController)
+                        }
+                    }
                 }
+            }
+        }
+
+        // Botón de evaluación como botón flotante en la esquina inferior derecha
+        FloatingActionButton(
+            containerColor = MaterialTheme.colorScheme.primary,
+            onClick = {
+                // Navegar a la página de evaluación al hacer clic en el botón "EVALUAR"
+                navController.navigate(route = "evaluacion")
+            },
+            modifier = Modifier
+                .padding(16.dp)
+                .align(Alignment.BottomEnd)
+        ) {
+            Row(
+                modifier = Modifier.padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Star,
+                    contentDescription = "Estrella",
+                    tint = Color.White,
+                    modifier = Modifier.size(24.dp)
+                )
+                Text(
+                    text = "Evalúame!",
+                    style = MaterialTheme.typography.headlineLarge,
+                    fontFamily = SofiaSans
+                )
             }
         }
     }
 }
+
+
+
+
 
 
 @Composable
