@@ -206,7 +206,7 @@ fun BodyContent(navController: NavController, modifier: Modifier) {
                             .weight(1f)
                             .padding(18.dp)
                     ) {
-                        CardProfesor2(profesor = profesor)
+                        CardProfesor(profesor = profesor)
                     }
                 }
             }
@@ -216,12 +216,12 @@ fun BodyContent(navController: NavController, modifier: Modifier) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CardProfesor2(profesor: Profesor) {
+fun CardProfesor(profesor: Profesor) {
     Card(
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.inverseOnSurface
         ),
-        onClick = { BotFunctions.speak("${profesor.nombre} es ${profesor.cargo}")},
+        onClick = { BotFunctions.speak("${profesor.nombre} es ${profesor.cargo}",showAnimationOnly = false)},
         modifier = Modifier
             .fillMaxWidth()
             .height(250.dp),

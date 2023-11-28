@@ -11,7 +11,7 @@ import com.seotepa.infobotApp.AssistantUI
 import com.seotepa.infobotApp.BotFunctions
 import com.seotepa.infobotApp.CarrerasScreen
 import com.seotepa.infobotApp.EvaluacionScreen
-import com.seotepa.infobotApp.GaleriaScreen
+import com.seotepa.infobotApp.DiplomadosScreen
 import com.seotepa.infobotApp.SharedViewModel
 
 object NavControllerProvider {
@@ -32,9 +32,9 @@ fun AppNavigation(sharedViewModel: SharedViewModel){
             BotFunctions.hideTopBar()
             AcademicosScreen(navController)
         }
-        composable(route = AppScreens.GaleriaScreen.route){
+        composable(route = AppScreens.DiplomadosScreen.route){
             BotFunctions.hideTopBar()
-            GaleriaScreen(navController)
+            DiplomadosScreen(navController)
         }
         composable(route = AppScreens.CarrerasScreen.route){
             BotFunctions.hideTopBar()

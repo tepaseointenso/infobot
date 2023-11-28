@@ -1,7 +1,6 @@
 package com.seotepa.infobotApp
 
 import android.annotation.SuppressLint
-import android.app.Application
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -58,7 +57,7 @@ data class Evaluacion(val estrellas: Int)
 val botones = listOf(
     Boton("Profesores", image = R.drawable.civil, route = AppScreens.AcademicosScreen.route),
     Boton("Carreras", image = R.drawable.datos, route = AppScreens.CarrerasScreen.route),
-    Boton("Doctorados", image = R.drawable.informatica, route = AppScreens.GaleriaScreen.route)
+    Boton("Diplomados", image = R.drawable.informatica, route = AppScreens.DiplomadosScreen.route)
 )
 
 

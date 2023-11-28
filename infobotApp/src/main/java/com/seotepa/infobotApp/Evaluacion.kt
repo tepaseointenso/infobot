@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
@@ -26,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 
 import com.seotepa.infobotApp.ui.theme.SofiaSans
@@ -43,8 +45,8 @@ fun EvaluacionScreen(navController: NavController) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "Selecciona el número de estrellas:",
-            style = MaterialTheme.typography.headlineLarge,
+            text = "¿Qué te ha parecido la aplicación?",
+            style = MaterialTheme.typography.titleLarge,
             fontFamily = SofiaSans
         )
 
@@ -60,13 +62,14 @@ fun EvaluacionScreen(navController: NavController) {
         Spacer(modifier = Modifier.height(32.dp))
 
         Button(
-            onClick = {
+            modifier = Modifier.height(100.dp).width(400.dp),
+                    onClick = {
                 // Guardar la evaluación en un archivo del dispositivo o realizar otras acciones necesarias.
                 // En este ejemplo, simplemente navegamos de nuevo a la pantalla anterior.
                 navController.navigateUp()
             }
         ) {
-            Text(text = "Guardar Evaluación")
+            Text(text = "Guardar Evaluación", fontSize = (40.sp))
         }
     }
 }
@@ -87,7 +90,7 @@ fun RatingBar(
                 imageVector = starIcon,
                 contentDescription = null,
                 modifier = Modifier
-                    .size(36.dp)
+                    .size(100.dp)
                     .clickable {
                         onRatingChanged(starIndex.toFloat())
                     }

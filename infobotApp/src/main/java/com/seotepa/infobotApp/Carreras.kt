@@ -2,20 +2,20 @@ package com.seotepa.infobotApp
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Menu
@@ -25,7 +25,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -42,25 +41,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.Wallpapers
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.seotepa.infobotApp.ui.theme.SofiaSans
 
-data class Carrera(val title: String, val image:Int)
-
-val carreras = listOf(
-    Carrera("Ingeniería Civil Informática", image = R.drawable.civil),
-    Carrera("Ingeniería en Ciencia de Datos", image = R.drawable.datos),
-    Carrera("Ingeniería en Informática", image = R.drawable.informatica)
-)
-
-val diplomados = listOf(
-    Carrera("BIG DATA Y DATA SCIENCE", image = R.drawable.civil),
-    Carrera("EXPERIENCIA DEL USUARIO", image = R.drawable.datos),
-    Carrera("INTELIGENCIA ARTIFICIAL", image = R.drawable.informatica),
-    Carrera("EXPERIENCIA DEL CONSUMIDOR", image = R.drawable.datos),
-    Carrera("CIBERSEGURIDAD", image = R.drawable.informatica)
-)
+val carreras = listaCarreras
 
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -78,7 +66,7 @@ fun CardList(navController: NavController) {
                 ),
                 title = {
                     Text(
-                        "INFOBOT PUCV",
+                        "CARRERAS",
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         style = MaterialTheme.typography.displayLarge,
@@ -103,6 +91,9 @@ fun CardList(navController: NavController) {
                     }
                 },
             )
+        },
+        content = {
+            CarrerasContent(navController, modifier = Modifier.padding(it))
         },
         bottomBar = {
             BottomAppBar(
@@ -135,106 +126,236 @@ fun CardList(navController: NavController) {
                 }
             }
         }
-    ) {
-        Column(
-            modifier = Modifier
-            .fillMaxSize(),
-            verticalArrangement = Arrangement.Center, // Centra verticalmente los elementos
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            CarrerasRow()
-            Divider(thickness = 5.dp, color = MaterialTheme.colorScheme.onPrimaryContainer, modifier = Modifier.padding(vertical = 10.dp))
-            DiplomadosRow()
-        }
-
-    }
+    )
 }
+
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TarjetaCarrera(carrera: Carrera) {
+fun CarreraCard(carrera: CarreraInformatica) {
     Card(
-        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.inverseOnSurface
+        ),
+        onClick = { BotFunctions.speak("La carrera de ${carrera.nombre} dura ${carrera.duracionSemestres} semestres")},
         modifier = Modifier
-            .width(250.dp) // Establece el ancho deseado para hacer la tarjeta cuadrada
-            .height(250.dp) // Establece la altura deseada para hacer la tarjeta cuadrada
+            .fillMaxWidth()
+            .fillMaxHeight(),
+        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
+        shape = RoundedCornerShape(16.dp)
     ) {
         Box {
-            // Imagen de fondo
-            Image(
-                painter = painterResource(id = carrera.image),
-                contentDescription = null,
-                contentScale = ContentScale.FillHeight,
-                alpha = 0.4f,
-                modifier = Modifier
-                    .background(Color.Black)
-            )
+            Row{
+                // Imagen a la izquierda
+                Image(
+                    painter = painterResource(id = carrera.image),
+                    contentDescription = null,
+                    contentScale = ContentScale.FillHeight,
+                    modifier = Modifier
+                        .width(250.dp) // Ajusta el ancho de la imagen según sea necesario
+                        .fillMaxHeight()
+                )
 
-            // Texto centrado abajo
-            Text(
-                text = carrera.title,
-                modifier = Modifier // Centra el texto en la parte inferior
-                    .padding(16.dp) // Margen interno
-                    .align(Alignment.BottomCenter),
-                style = MaterialTheme.typography.headlineMedium,
-                color = MaterialTheme.colorScheme.inversePrimary,
-                fontWeight = FontWeight.ExtraBold,
-            )
-        }
-    }
-}
+                Column(
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .weight(0.3f)
+                ) {
+                    // Texto a la derecha
+                    Text(
+                        text = carrera.nombre,
+                        modifier = Modifier
+                            .padding(bottom = 8.dp) // Margen interno
+                            .fillMaxWidth(),
+                        style = MaterialTheme.typography.displaySmall,
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.ExtraBold,
+                        fontFamily = SofiaSans
+                    )
 
-@Composable
-fun CarrerasRow(){
-    Column(modifier = Modifier.padding(vertical = 26.dp)) {
-        Text(
-            text = "Carreras disponibles",
-            style = MaterialTheme.typography.displayMedium,
-            modifier = Modifier
-                .align(Alignment.CenterHorizontally)
-                .padding(vertical = 26.dp),
-            fontFamily = SofiaSans
-        )
-        Row (
-            modifier = Modifier
-                .fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceAround,
-        ){
-            carreras.forEach() {
-                Column {
-                    TarjetaCarrera(carrera = it)
+                    // Primera fila
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp)
+                    ) {
+                        // Columna para "Grado"
+                        if (carrera.grado.isNotEmpty()) {
+                            Column(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .padding(end = 16.dp)
+                            ) {
+                                Text(
+                                    text = "Grado:",
+                                    style = MaterialTheme.typography.headlineLarge,
+                                    color = MaterialTheme.colorScheme.primary,
+                                    fontWeight = FontWeight.Bold,
+                                    fontFamily = SofiaSans
+                                )
+                                Text(
+                                    text = carrera.grado,
+                                    color = MaterialTheme.colorScheme.primary,
+                                    fontFamily = SofiaSans,
+                                    style = MaterialTheme.typography.titleLarge
+                                )
+                            }
+                        }
+
+                        // Columna para "Duración"
+                        if (carrera.duracionSemestres > 0) {
+                            Column(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .padding(end = 16.dp)
+                            ) {
+                                Text(
+                                    text = "Duración:",
+                                    style = MaterialTheme.typography.headlineLarge,
+                                    color = MaterialTheme.colorScheme.primary,
+                                    fontWeight = FontWeight.Bold,
+                                    fontFamily = SofiaSans
+                                )
+                                Text(
+                                    text = "${carrera.duracionSemestres.toString()} semestres",
+                                    style = MaterialTheme.typography.titleLarge,
+                                    color = MaterialTheme.colorScheme.primary,
+                                    fontFamily = SofiaSans
+                                )
+                            }
+                        }
+
+                        // Columna para "Título"
+                        if (carrera.titulo.isNotEmpty()) {
+                            Column(
+                                modifier = Modifier
+                                    .weight(1f)
+                            ) {
+                                Text(
+                                    text = "Título:",
+                                    style = MaterialTheme.typography.headlineLarge,
+                                    color = MaterialTheme.colorScheme.primary,
+                                    fontWeight = FontWeight.Bold,
+                                    fontFamily = SofiaSans
+                                )
+                                Text(
+                                    text = carrera.titulo,
+                                    style = MaterialTheme.typography.titleLarge,
+                                    color = MaterialTheme.colorScheme.primary,
+                                    fontFamily = SofiaSans
+                                )
+                            }
+                        }
+                    }
+
+                    // Segunda fila
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp)
+                    ) {
+                        // Columna para "Ponderación"
+                        if (carrera.ponderacion.isNotEmpty()) {
+                            Column(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .padding(end = 16.dp)
+                            ) {
+                                Text(
+                                    text = "Ponderación:",
+                                    style = MaterialTheme.typography.headlineLarge,
+                                    color = MaterialTheme.colorScheme.primary,
+                                    fontWeight = FontWeight.Bold,
+                                    fontFamily = SofiaSans
+                                )
+                                carrera.ponderacion.forEach { (key, value) ->
+                                    Text(
+                                        text = "$key: $value%",
+                                        style = MaterialTheme.typography.titleLarge,
+                                        color = MaterialTheme.colorScheme.primary,
+                                        fontFamily = SofiaSans
+                                    )
+                                }
+                            }
+                        }
+
+                        // Columna para "Puntaje de Referencia"
+                        if (carrera.puntajeReferencia.isNotEmpty()) {
+                            Column(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .padding(end = 16.dp)
+                            ) {
+                                Text(
+                                    text = "Puntaje de Referencia:",
+                                    style = MaterialTheme.typography.headlineLarge,
+                                    color = MaterialTheme.colorScheme.primary,
+                                    fontWeight = FontWeight.Bold,
+                                    fontFamily = SofiaSans
+                                )
+                                carrera.puntajeReferencia.forEach { (key, value) ->
+                                    Text(
+                                        text = "$key: $value",
+                                        style = MaterialTheme.typography.titleLarge,
+                                        color = MaterialTheme.colorScheme.primary,
+                                        fontFamily = SofiaSans
+                                    )
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
     }
 }
 
-@Composable
-fun DiplomadosRow(){
-    Column() {
-        Text(
-            text = "Diplomados impartidos",
-            style = MaterialTheme.typography.displayMedium,
-            modifier = Modifier.align(Alignment.CenterHorizontally),
-            fontFamily = SofiaSans
-        )
-        LazyRow (
-            contentPadding = PaddingValues(36.dp),
-            horizontalArrangement = Arrangement.spacedBy(space = 36.dp),
-        ){
-            items(items = diplomados, itemContent = { diplomado ->
-                Column {
-                    TarjetaCarrera(diplomado)
-                }
-            })
 
+
+
+
+
+@Composable
+fun CarrerasContent(navController: NavController, modifier: Modifier) {
+    LazyColumn (
+        verticalArrangement = Arrangement.Center,
+        modifier = modifier.fillMaxHeight()
+    ) {
+        items(carreras.chunked(2)) { rowOfCarreras ->
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                rowOfCarreras.forEach { carrera ->
+                    Column(
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(32.dp)
+                            .height(500.dp)
+                    ) {
+                        CarreraCard(carrera = carrera)
+                    }
+                }
+            }
         }
     }
 }
 
 
-
-
 @Composable
 fun CarrerasScreen(navController: NavController) {
+    CardList(navController)
+}
+
+@Composable
+@Preview(
+    widthDp = 1920,
+    heightDp = 1080,
+    wallpaper = Wallpapers.BLUE_DOMINATED_EXAMPLE)
+fun CarrerasScreenPreview() {
+    val navController = rememberNavController()
     CardList(navController)
 }
 
