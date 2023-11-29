@@ -10,9 +10,10 @@ import com.seotepa.infobotApp.AcademicosScreen
 import com.seotepa.infobotApp.AssistantUI
 import com.seotepa.infobotApp.BotFunctions
 import com.seotepa.infobotApp.CarrerasScreen
-import com.seotepa.infobotApp.EvaluacionScreen
 import com.seotepa.infobotApp.DiplomadosScreen
+import com.seotepa.infobotApp.EvaluacionScreen
 import com.seotepa.infobotApp.SharedViewModel
+import com.seotepa.infobotApp.VistaDetalleScreen
 
 object NavControllerProvider {
     var navController: NavController? = null
@@ -21,28 +22,50 @@ object NavControllerProvider {
 @Composable
 fun AppNavigation(sharedViewModel: SharedViewModel){
     val navController = rememberNavController()
-    sharedViewModel.navController.value = navController
     NavControllerProvider.navController = navController
-    NavHost(navController = navController, startDestination = AppScreens.PrincipalScreen.route){
+
+    NavHost(navController = navController, startDestination = AppScreens.PrincipalScreen.route) {
         composable(route = AppScreens.PrincipalScreen.route) {
             BotFunctions.hideTopBar()
-            AssistantUI(navController)
+            sharedViewModel.setCurrentPage(navController.currentBackStackEntry?.destination?.route ?: "")
+            AssistantUI(navController, sharedViewModel)
         }
         composable(route = AppScreens.AcademicosScreen.route){
             BotFunctions.hideTopBar()
-            AcademicosScreen(navController)
+            sharedViewModel.setCurrentPage(navController.currentBackStackEntry?.destination?.route ?: "")
+            AcademicosScreen(navController,sharedViewModel)
         }
         composable(route = AppScreens.DiplomadosScreen.route){
             BotFunctions.hideTopBar()
-            DiplomadosScreen(navController)
+            sharedViewModel.setCurrentPage(navController.currentBackStackEntry?.destination?.route ?: "")
+
+            DiplomadosScreen(navController,sharedViewModel)
         }
         composable(route = AppScreens.CarrerasScreen.route){
             BotFunctions.hideTopBar()
-            CarrerasScreen(navController)
+            sharedViewModel.setCurrentPage(navController.currentBackStackEntry?.destination?.route ?: "")
+
+            CarrerasScreen(navController,sharedViewModel)
         }
         composable(route = AppScreens.EvaluacionScreen.route){
             BotFunctions.hideTopBar()
-            EvaluacionScreen(navController)
+            sharedViewModel.setCurrentPage(navController.currentBackStackEntry?.destination?.route ?: "")
+
+            EvaluacionScreen(navController,sharedViewModel)
+        }
+        composable(route = "vistadetalle/diplomados/{id}") {
+            val id = it.arguments?.getString("id")
+            BotFunctions.hideTopBar()
+            sharedViewModel.setCurrentPage(navController.currentBackStackEntry?.destination?.route ?: "")
+
+            VistaDetalleScreen(navController, id, sharedViewModel)
+        }
+        composable(route = "vistadetalle/carreras/{id}") {
+            val id = it.arguments?.getString("id")
+            BotFunctions.hideTopBar()
+            sharedViewModel.setCurrentPage(navController.currentBackStackEntry?.destination?.route ?: "")
+
+            VistaDetalleScreen(navController, id, sharedViewModel)
         }
     }
 }

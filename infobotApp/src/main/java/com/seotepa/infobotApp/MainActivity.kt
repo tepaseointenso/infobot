@@ -37,19 +37,55 @@ import androidx.compose.ui.Modifier
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.ViewModelProvider
 import com.google.gson.Gson
-import com.robotemi.sdk.*
-import com.robotemi.sdk.Robot.*
+import com.robotemi.sdk.MediaObject
+import com.robotemi.sdk.NlpResult
+import com.robotemi.sdk.Robot
+import com.robotemi.sdk.Robot.ActivityStreamPublishListener
+import com.robotemi.sdk.Robot.AsrListener
 import com.robotemi.sdk.Robot.Companion.getInstance
+import com.robotemi.sdk.Robot.ConversationViewAttachesListener
+import com.robotemi.sdk.Robot.NlpListener
+import com.robotemi.sdk.Robot.TtsListener
+import com.robotemi.sdk.Robot.WakeupWordListener
+import com.robotemi.sdk.SourceObject
+import com.robotemi.sdk.TtsRequest
 import com.robotemi.sdk.TtsRequest.Companion.create
 import com.robotemi.sdk.activitystream.ActivityStreamObject
 import com.robotemi.sdk.activitystream.ActivityStreamPublishMessage
-import com.robotemi.sdk.constants.*
+import com.robotemi.sdk.constants.CliffSensorMode
+import com.robotemi.sdk.constants.ContentType
+import com.robotemi.sdk.constants.Gender
+import com.robotemi.sdk.constants.HardButton
+import com.robotemi.sdk.constants.Mode
+import com.robotemi.sdk.constants.Page
+import com.robotemi.sdk.constants.Platform
+import com.robotemi.sdk.constants.SdkConstants
+import com.robotemi.sdk.constants.SensitivityLevel
+import com.robotemi.sdk.constants.SoundMode
 import com.robotemi.sdk.exception.OnSdkExceptionListener
 import com.robotemi.sdk.exception.SdkException
 import com.robotemi.sdk.face.ContactModel
 import com.robotemi.sdk.face.OnContinuousFaceRecognizedListener
 import com.robotemi.sdk.face.OnFaceRecognizedListener
-import com.robotemi.sdk.listeners.*
+import com.robotemi.sdk.listeners.OnBeWithMeStatusChangedListener
+import com.robotemi.sdk.listeners.OnConstraintBeWithStatusChangedListener
+import com.robotemi.sdk.listeners.OnConversationStatusChangedListener
+import com.robotemi.sdk.listeners.OnDetectionDataChangedListener
+import com.robotemi.sdk.listeners.OnDetectionStateChangedListener
+import com.robotemi.sdk.listeners.OnDisabledFeatureListUpdatedListener
+import com.robotemi.sdk.listeners.OnGoToLocationStatusChangedListener
+import com.robotemi.sdk.listeners.OnGreetModeStateChangedListener
+import com.robotemi.sdk.listeners.OnLocationsUpdatedListener
+import com.robotemi.sdk.listeners.OnMovementStatusChangedListener
+import com.robotemi.sdk.listeners.OnMovementVelocityChangedListener
+import com.robotemi.sdk.listeners.OnRobotDragStateChangedListener
+import com.robotemi.sdk.listeners.OnRobotLiftedListener
+import com.robotemi.sdk.listeners.OnRobotReadyListener
+import com.robotemi.sdk.listeners.OnTelepresenceEventChangedListener
+import com.robotemi.sdk.listeners.OnTelepresenceStatusChangedListener
+import com.robotemi.sdk.listeners.OnTtsVisualizerFftDataChangedListener
+import com.robotemi.sdk.listeners.OnTtsVisualizerWaveFormDataChangedListener
+import com.robotemi.sdk.listeners.OnUserInteractionChangedListener
 import com.robotemi.sdk.map.Floor
 import com.robotemi.sdk.map.MapModel
 import com.robotemi.sdk.map.OnLoadFloorStatusChangedListener
@@ -83,7 +119,8 @@ import com.seotepa.infobotApp.ui.theme.SdkTheme
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
-import java.util.*
+import java.util.Locale
+import java.util.UUID
 import java.util.concurrent.Executors
 
 
@@ -959,6 +996,7 @@ class MainActivity : AppCompatActivity(), NlpListener,OnRobotReadyListener,
                 "Profesores",
                 ignoreCase = true
             ) || asrResult.contains("¿Cuales son los profesores?", ignoreCase = true) -> {
+
                 robot.finishConversation()
                 sharedViewModel.navController.value?.navigate(AppScreens.AcademicosScreen.route)
                 robot.speak(
@@ -1029,6 +1067,7 @@ class MainActivity : AppCompatActivity(), NlpListener,OnRobotReadyListener,
                 robot.stopMovement()
 
             }
+
 
             else -> {
                 val ttsStatusListener = object : TtsListener {

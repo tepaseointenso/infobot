@@ -6,15 +6,16 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Menu
@@ -44,20 +45,10 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.seotepa.infobotApp.ui.theme.SofiaSans
 
-data class Diplomado(val title: String, val image:Int)
-
-val diplomados = listOf(
-    Diplomado("BIG DATA Y DATA SCIENCE", image = R.drawable.civil),
-    Diplomado("EXPERIENCIA DEL USUARIO", image = R.drawable.datos),
-    Diplomado("INTELIGENCIA ARTIFICIAL", image = R.drawable.informatica),
-    Diplomado("EXPERIENCIA DEL CONSUMIDOR", image = R.drawable.datos),
-    Diplomado("CIBERSEGURIDAD", image = R.drawable.informatica)
-)
-
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ListadoDiplomados(navController: NavController) {
+fun ListadoDiplomados(navController: NavController, sharedViewModel: SharedViewModel) {
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.primaryContainer,
@@ -95,6 +86,9 @@ fun ListadoDiplomados(navController: NavController) {
                 },
             )
         },
+        content = {
+            DiplomadosContent(navController, modifier = Modifier.padding(it))
+        },
         bottomBar = {
             BottomAppBar(
                 containerColor = MaterialTheme.colorScheme.onSecondaryContainer,
@@ -126,43 +120,43 @@ fun ListadoDiplomados(navController: NavController) {
                 }
             }
         }
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize(),
-            verticalArrangement = Arrangement.Center, // Centra verticalmente los elementos
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            DiplomadosRow()
-        }
-
-    }
+    )
 }
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TarjetaDiplomado(diplomado: Diplomado) {
+fun TarjetaDiplomado(navController: NavController, diplomado: Diplomado) {
     Card(
-        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.inverseOnSurface
+        ),
+        onClick = {
+            val id = diplomado.id
+            println("PARAMT, $id")
+            // Navegar a VistaDetalleScreen y pasar el 'id' como parámetro
+            navController.navigate("vistadetalle/diplomados/$id")
+        },
         modifier = Modifier
-            .width(250.dp) // Establece el ancho deseado para hacer la tarjeta cuadrada
-            .height(250.dp) // Establece la altura deseada para hacer la tarjeta cuadrada
+            .fillMaxWidth()
+            .fillMaxHeight(),
+        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
+        shape = RoundedCornerShape(16.dp)
     ) {
         Box {
-            // Imagen de fondo
             Image(
                 painter = painterResource(id = diplomado.image),
                 contentDescription = null,
-                contentScale = ContentScale.FillHeight,
+                contentScale = ContentScale.Crop,
                 alpha = 0.4f,
                 modifier = Modifier
+                    .fillMaxSize()
                     .background(Color.Black)
             )
 
-            // Texto centrado abajo
             Text(
                 text = diplomado.title,
-                modifier = Modifier // Centra el texto en la parte inferior
-                    .padding(16.dp) // Margen interno
-                    .align(Alignment.BottomCenter),
+                modifier = Modifier
+                    .padding(16.dp)
+                    .align(Alignment.BottomStart),
                 style = MaterialTheme.typography.headlineMedium,
                 color = MaterialTheme.colorScheme.inversePrimary,
                 fontWeight = FontWeight.ExtraBold,
@@ -171,28 +165,43 @@ fun TarjetaDiplomado(diplomado: Diplomado) {
     }
 }
 
-@Composable
-fun DiplomadosRow(){
-    Column() {
-        LazyRow (
-            contentPadding = PaddingValues(36.dp),
-            horizontalArrangement = Arrangement.spacedBy(space = 36.dp),
-        ){
-            items(items = diplomados, itemContent = { diplomado ->
-                Column {
-                    TarjetaDiplomado(diplomado)
-                }
-            })
 
+
+
+@Composable
+fun DiplomadosContent(navController: NavController, modifier: Modifier) {
+    LazyColumn(
+        verticalArrangement = Arrangement.Center,
+        modifier = modifier
+            .fillMaxHeight()
+    ) {
+        items(listaDiplomados.chunked(3)) { rowOfDiplomados ->
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                rowOfDiplomados.forEach { diplomado ->
+                    Column(
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(32.dp)
+                            .height(300.dp)
+                    ) {
+                        TarjetaDiplomado(navController, diplomado)
+                    }
+                }
+            }
         }
     }
 }
 
 
-
-
 @Composable
-fun DiplomadosScreen(navController: NavController) {
-    ListadoDiplomados(navController)
+fun DiplomadosScreen(navController: NavController, sharedViewModel: SharedViewModel) {
+    val currentPage = sharedViewModel.currentPage.value
+    println("PAGINA ACTUAL, $currentPage")
+    ListadoDiplomados(navController, sharedViewModel)
 }
 

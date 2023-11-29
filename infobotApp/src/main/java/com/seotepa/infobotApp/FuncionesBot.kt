@@ -42,6 +42,10 @@ object BotFunctions {
         robot.askQuestion("¿En que puedo ayudarte?")
     }
 
+    fun preguntarDetalles() {
+        robot.askQuestion("¿Qué detalles deseas conocer?")
+    }
+
     // Otras funciones pueden ir aquí
 
 }

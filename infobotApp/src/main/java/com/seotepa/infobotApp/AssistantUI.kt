@@ -64,7 +64,9 @@ val botones = listOf(
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AssistantUI(navController: NavController) {
+fun AssistantUI(navController: NavController, sharedViewModel: SharedViewModel) {
+    val currentPage = sharedViewModel.currentPage.value
+    println("PAGINA ACTUAL, $currentPage")
     Scaffold(
         containerColor = MaterialTheme.colorScheme.primaryContainer,
         topBar = {
@@ -239,7 +241,8 @@ fun BotonesContainer(navController: NavController, modifier: Modifier) {
 fun AssistantUIPreview() {
     SdkTheme {
         val navController = rememberNavController()
-        AssistantUI(navController)
+        val sharedViewModel = SharedViewModel()
+        AssistantUI(navController, sharedViewModel)
     }
 }
 

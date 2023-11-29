@@ -24,17 +24,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-
 import com.seotepa.infobotApp.ui.theme.SofiaSans
 
 
 @Composable
-fun EvaluacionScreen(navController: NavController) {
+fun EvaluacionScreen(navController: NavController, sharedViewModel: SharedViewModel) {
+    val currentPage = sharedViewModel.currentPage.value
+    println("PAGINA ACTUAL, $currentPage")
     var selectedStars by remember { mutableStateOf(0) }
 
     Column(
@@ -99,9 +98,4 @@ fun RatingBar(
     }
 }
 
-@Composable
-@Preview
-fun EvaluacionScreenPreview() {
-    EvaluacionScreen(navController = NavController(LocalContext.current))
-}
 

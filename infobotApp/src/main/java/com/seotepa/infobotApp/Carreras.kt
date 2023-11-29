@@ -46,6 +46,7 @@ import androidx.compose.ui.tooling.preview.Wallpapers
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.seotepa.infobotApp.navigation.NavControllerProvider.navController
 import com.seotepa.infobotApp.ui.theme.SofiaSans
 
 val carreras = listaCarreras
@@ -137,7 +138,11 @@ fun CarreraCard(carrera: CarreraInformatica) {
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.inverseOnSurface
         ),
-        onClick = { BotFunctions.speak("La carrera de ${carrera.nombre} dura ${carrera.duracionSemestres} semestres")},
+        onClick = { val id = carrera.id
+            println("PARAMT, $id")
+            // Navegar a VistaDetalleScreen y pasar el 'id' como parámetro
+            navController?.navigate("vistadetalle/carreras/$id")
+        },
         modifier = Modifier
             .fillMaxWidth()
             .fillMaxHeight(),
@@ -345,7 +350,9 @@ fun CarrerasContent(navController: NavController, modifier: Modifier) {
 
 
 @Composable
-fun CarrerasScreen(navController: NavController) {
+fun CarrerasScreen(navController: NavController, sharedViewModel: SharedViewModel) {
+    val currentPage = sharedViewModel.currentPage.value
+    println("PAGINA ACTUAL, $currentPage")
     CardList(navController)
 }
 

@@ -110,7 +110,7 @@ val profesores = listOf<Profesor>(
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AcademicosScreen(navController: NavController) {
+fun AcademicosScreen(navController: NavController, sharedViewModel: SharedViewModel) {
     Scaffold(
         containerColor = MaterialTheme.colorScheme.primaryContainer,
         topBar = {
@@ -284,7 +284,8 @@ fun CardProfesor(profesor: Profesor) {
 fun BodyContentPreview() {
     SdkTheme {
         val navController = rememberNavController()
-        AcademicosScreen(navController)
+        val sharedViewModel = SharedViewModel()
+        AcademicosScreen(navController, sharedViewModel)
     }
 }
 
