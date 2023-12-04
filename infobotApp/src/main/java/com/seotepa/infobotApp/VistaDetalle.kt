@@ -46,9 +46,16 @@ import com.seotepa.infobotApp.ui.theme.SofiaSans
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun VistaDetalleScreen(navController: NavController, id: String?, sharedViewModel: SharedViewModel) {
-
-    val carreraSeleccionada = listaCarreras.find { it.id == id }
-    val diplomadoSeleccionado = null
+    val tipo = sharedViewModel.currentPage.value
+    var diplomadoSeleccionado: Diplomado? = null
+    var carreraSeleccionada: CarreraInformatica? = null
+    if (tipo?.contains("diplomados") == true) {
+        diplomadoSeleccionado = listaDiplomados.find { it.id == id }
+        carreraSeleccionada = null
+    } else {
+        diplomadoSeleccionado = null
+        carreraSeleccionada = listaCarreras.find { it.id == id }
+    }
     Scaffold(
         containerColor = MaterialTheme.colorScheme.primaryContainer,
         topBar = {
@@ -67,7 +74,11 @@ fun VistaDetalleScreen(navController: NavController, id: String?, sharedViewMode
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
+                    IconButton(onClick = {
+                        if (tipo != null) {
+                            if (tipo.contains("diplomados")) navController.navigate("diplomados")
+                            else navController.navigate("carreras")
+                         }}) {
                         Icon(
                             imageVector = Icons.Filled.ArrowBack,
                             tint = Color.White,
@@ -86,33 +97,23 @@ fun VistaDetalleScreen(navController: NavController, id: String?, sharedViewMode
             )
         },
         content = {
-//            val currentPage = sharedViewModel.currentPage.value
-//            if (currentPage != null) {
-//                if (currentPage.startsWith("vistadetalles/carreras")) {
-//                    // Extraer el ID de la carrera
-//                    val carreraId = currentPage.substringAfterLast("/")
-//
-//                    // Lógica para mostrar el detalle de la carrera
-//
-//                } else if (currentPage.startsWith("vistadetalles/diplomados")) {
-//                    // Extraer el ID del diplomado
-//                    val diplomadoId = currentPage.substringAfterLast("/")
-//                    val diplomadoSeleccionado = listaDiplomados.find { it.id == diplomadoId }
-//                    val carreraSeleccionada = null
-//                }
+            var idSeleccion: String = ""
+            if (carreraSeleccionada != null) {
+                idSeleccion = carreraSeleccionada.id
+                CarreraDetailView(carreraSeleccionada)
+            }
+            else if (diplomadoSeleccionado != null) {
+                idSeleccion = diplomadoSeleccionado.id
+                DiplomadoDetailView(navController, modifier = Modifier.padding(it), diplomado = diplomadoSeleccionado)
+            }
             Box(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(it)
-            ) {
-                // Vista de detalle para Carreras
-                if (carreraSeleccionada != null) {
-                    CarreraDetailView(carreraSeleccionada)
-                }
-
+            ){
                 // Botón + INFO en la esquina superior derecha
                 Button(
-                    onClick = { BotFunctions.preguntarDetalles() },
+                    onClick = { BotFunctions.preguntarDetalles()},
                     modifier = Modifier
                         .align(Alignment.TopEnd)
                         .padding(8.dp)

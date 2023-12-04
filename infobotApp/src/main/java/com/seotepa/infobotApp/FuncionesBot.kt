@@ -12,17 +12,24 @@ import com.robotemi.sdk.TtsRequest.Companion.create
 
 // Objeto compañero para organizar funciones
 lateinit var robot: Robot
+
 object BotFunctions {
     val robot = Robot.getInstance()
+    var paginaActual: String? = null
 
 
     // Puedes definir tus funciones aquí
     fun speak(text: String, showAnimationOnly: Boolean = false, mostrarInterfaz: Boolean = false) {
-        val ttsRequest = create(text, language = TtsRequest.Language.ES_ES, showAnimationOnly = showAnimationOnly, isShowOnConversationLayer = mostrarInterfaz)
+        val ttsRequest = create(
+            text,
+            language = TtsRequest.Language.ES_ES,
+            showAnimationOnly = showAnimationOnly,
+            isShowOnConversationLayer = mostrarInterfaz
+        )
         robot.speak(ttsRequest)
     }
 
-     fun getNickName() {
+    fun getNickName() {
         speak("temi's nick name: ${robot.getNickName()}")
     }
 
@@ -45,9 +52,6 @@ object BotFunctions {
     fun preguntarDetalles() {
         robot.askQuestion("¿Qué detalles deseas conocer?")
     }
-
-    // Otras funciones pueden ir aquí
-
 }
 
 // También puedes tener funciones y variables fuera del objeto compañero si es necesario

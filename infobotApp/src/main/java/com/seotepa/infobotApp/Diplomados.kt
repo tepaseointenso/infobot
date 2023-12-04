@@ -68,7 +68,7 @@ fun ListadoDiplomados(navController: NavController, sharedViewModel: SharedViewM
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
+                    IconButton(onClick = { navController.navigate("principal") }) {
                         Icon(
                             imageVector = Icons.Filled.ArrowBack,
                             tint = Color.White,

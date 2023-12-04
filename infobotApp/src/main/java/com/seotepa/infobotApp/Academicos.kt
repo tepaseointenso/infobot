@@ -49,63 +49,7 @@ import androidx.navigation.compose.rememberNavController
 import com.seotepa.infobotApp.ui.theme.SdkTheme
 import com.seotepa.infobotApp.ui.theme.SofiaSans
 
-data class Profesor(val nombre: String, val image:Int, val cargo: String, val titulos: List<String>)
 
-val profesores = listOf<Profesor>(
-    Profesor("Ricardo Soto de Giorgis", R.drawable.ricardosoto, "Director de Escuela de Ingeniería Informática", listOf("PhD in Computer Science, Universidad de Nantes, Francia, 2009",
-        "Ingeniero Civil en Informática, Pontificia Universidad Católica de Valparaíso, Chile, 2003",
-        "Licenciado en Ciencias de la Ingeniería, Pontificia Universidad Católica de Valparaíso, Chile, 2002")),
-    Profesor("Broderick Crawford Labrín", R.drawable.broderickcrawford, "Vice Decano Facultad de Ingeniería", listOf("Doctor en Ingeniería Informática, Universidad Técnica Federico Santa María, Chile, 2011",
-            "Master of Business Administration, Universidad de Chile, Chile, 2001",
-            "Ingeniero Civil en Informática, Universidad Técnica Federico Santa María, Chile, 1991",
-            "Licenciado en Ciencias de la Ingeniería, Universidad Técnica Federico Santa María, Chile, 1988")),
-    Profesor("Iván Mercado Bermúdez", R.drawable.ivanmercado, "Jefe de docencia", listOf("Ingeniero de Ejecución en Informática, Pontificia Universidad Católica de Valparaíso, Chile, 1994")),
-    Profesor("Wenceslao Palma Muñoz",  R.drawable.wenceslaopalma, "Director del diplomado de Ciberseguridad y del Diplomado en BigData y DataScience", listOf("PhD in Computer Science, Universidad de Nantes, Francia, 2010",
-            "Magíster en Ciencias de la Ingeniería Informática, Universidad Técnica Federico Santa María, Chile, 2004",
-            "Ingeniero de Ejecución en Informática, Pontificia Universidad Católica de Valparaíso, Chile, 1997")),
-    Profesor("Guillermo Cabrera Guerrero", R.drawable.guillermocabrera, "Director de Magister en Ingeniería Informática", listOf("PhD in Engineering Science, Universidad de Auckland, Nueva Zelanda, 2017",
-            "Magíster en Ingeniería Industrial, Mención Logística, Pontificia Universidad Católica de Valparaíso, Chile, 2009.",
-            "Ingeniero Civil en Informática, Pontificia Universidad Católica de Valparaíso, Chile, 2005.",
-            "Licenciado en Ciencias de la Ingeniería, Pontificia Universidad Católica de Valparaíso, Chile, 2004.")),
-    Profesor("Nibaldo Rodríguez Agurto", R.drawable.nibaldorodriguez, "Profesor Jornada Completa", listOf("Doctor en Ciencias de la Ingeniería, Universidad de Santiago de Chile, Chile, 2001",
-            "Magíster en Ingeniería Informática, Universidad de Santiago de Chile, Chile, 1998",
-            "Licenciado en Matemáticas y Computación, Universidad de Santiago de Chile, Chile, 1992")),
-    Profesor("Claudio Cubillos Figueroa", R.drawable.claudiocubillos, "Profesor Jornada Completa", listOf("Ph.D. in Information and Systems Engineering, Politécnico de Turín, Italia, 2005",
-            "Magíster en Ingeniería Industrial mención Gestión, Pontificia Universidad Católica de Valparaíso, Chile, 2001",
-            "Ingeniero Civil Industrial, Pontificia Universidad Católica de Valparaíso, Chile, 2000",
-            "Licenciado en Ciencias de la Ingeniería, Pontificia Universidad Católica de Valparaíso, Chile, 1999")),
-    Profesor("Pamela Hermosilla Monckton", R.drawable.pamelahermosilla, "Profesora Jornada Completa", listOf("Diplomado en Comercio Electrónico y Logística Empresarial, Universidad Técnica Federico Santa María, Chile, 2002",
-            "Ingeniero Civil en Informática, Universidad Técnica Federico Santa María, Chile, 1999",
-            "Licenciado en Ciencias de la Ingeniería, Universidad Técnica Federico Santa María, Chile, 1998")),
-    Profesor("Leslie Pérez Cáceres", R.drawable.leslieperez, "Directora del Diplomado en Inteligencia Artificial", listOf("Doctorat en Sciences de l’Ingénieur et Technologie, Universidad Libre de Bruselas, 2017",
-            "Magister en Ciencias de la Ingeniería Informática, Universidad Técnica Federico Santa María, 2011",
-            "Ingeniería Civil Informática, Universidad Técnica Federico Santa María, 2009")),
-    Profesor("Cristian Rusu", R.drawable.cristianrusu, "Director del Diplomado en Ingeniería Informática y Director del Diplomado en Experiencia del Consumidor y Experiencia del Usuario", listOf("Doctor of Science Engineering, Universidad Técnica de Cluj-Napoca, Rumania, 2002",
-            "Ingeniero Civil en Electrónica y Telecomunicaciones, Universidad Técnica de Cluj-Napoca, Rumania, 1984")),
-    Profesor("Daniela Quiñones Otey", R.drawable.danielaquinones, "Profesora Jornada Completa", listOf("Doctorado en Ingeniería Informática, Pontificia Universidad Católica de Valparaíso, Chile, 2018",
-            "Magíster en Ciencias de la Ingeniería Informática, Pontificia Universidad Católica de Valparaíso, Chile, 2016",
-            "Ingeniero Civil en Informática, Pontificia Universidad Católica de Valparaíso, Chile, 2014",
-            "Licenciado en Ciencias de la Ingeniería, Pontificia Universidad Católica de Valparaíso, Chile, 2013")),
-    Profesor("Silvana Roncagliolo De La Horra", R.drawable.silvanaroncagliolo, "Profesora Jornada Completa", listOf("Master of Science, Universidad Estatal de Oregón, Oregon, Estados Unidos, 1993",
-            "Ingeniero Civil en Informática, Universidad Técnica Federico Santa María, Chile, 1989",
-            "Licenciado en Ciencias de la Ingeniería, Universidad Técnica Federico Santa María, Chile, 1987")),
-    Profesor("Rodrigo Alfaro Arancibia", R.drawable.rodrigoalfaro, "Profesor Jornada Completa", listOf("Doctor en Ingeniería Informática, Universidad Técnica Federico Santa María, Chile, 2012",
-            "Magíster en Ingeniería Industrial, Pontificia Universidad Católica de Valparaíso, Chile, 2001",
-            "Ingeniero Civil Industrial, Pontificia Universidad Católica de Valparaíso, Chile, 2000",
-            "Licenciado en Ciencias de la Ingeniería, Pontificia Universidad Católica de Valparaíso, Chile, 1999")),
-    Profesor("Rodolgo Villarroel Acevedo", R.drawable.rodolfovillarroel, "Profesor Jornada Completa", listOf("Doctor en Ingeniería Informática, Universidad de Castilla-La Mancha, España, 2005",
-            "Magister en Ingeniería Informática, Universidad Técnica Federico Santa María, Chile, 2000",
-            "Ingeniería de Ejecución en Sistemas de Información, Universidad Técnica Federico Santa María, Chile, 1983")),
-    Profesor("Héctor Allende Cid", R.drawable.hectorallende, "Profesor Jornada Completa",listOf("Doctor en Ingeniería Informática, Universidad Técnica Federico Santa Maria, Chile, 2015.",
-            "Magíster en Ciencias de la Ingeniería Informática, Universidad Técnica Federico Santa Maria, Chile, 2009.",
-            "Ingeniero Civil Informático, Universidad Técnica Federico Santa Maria, Chile, 2009.")),
-    Profesor("Ignacio Araya Zamorano", R.drawable.ignacioaraya, "Jefe de Investigación", listOf("PhD in Computer Science, Universidad de Niza, Francia, 2010.",
-            "Magíster en Informática, Universidad Técnica Federico Santa María, Chile, 2007.",
-            "Ingeniero Civil Informático, Universidad Técnica Federico Santa María, Chile, 2007.")),
-    Profesor("Sandra Cano Mazuera", R.drawable.sandracano, "Profesora Jornada Completa", listOf("Doctora en Ciencia de la Electrónica, Universidad del Cauca, Colombia 2016",
-            "Ingeniera Electrónica, Universidad Autónoma de Occidente, 2002")),
-    Profesor("Aldo Migliaro Osorio", R.drawable.aldomigliaro, "Profesor Extraordinario", listOf("Ingeniero Civil Químico, Pontificia Universidad Católica de Valparaíso, Chile, 1975"))
-)
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -129,7 +73,7 @@ fun AcademicosScreen(navController: NavController, sharedViewModel: SharedViewMo
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
+                    IconButton(onClick = { navController.navigate("principal") }) {
                         Icon(
                             imageVector = Icons.Filled.ArrowBack,
                             tint = Color.White,

@@ -2,7 +2,6 @@ package com.seotepa.infobotApp.navigation
 
 import android.annotation.SuppressLint
 import androidx.compose.runtime.Composable
-import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -15,14 +14,12 @@ import com.seotepa.infobotApp.EvaluacionScreen
 import com.seotepa.infobotApp.SharedViewModel
 import com.seotepa.infobotApp.VistaDetalleScreen
 
-object NavControllerProvider {
-    var navController: NavController? = null
-}
+
 @SuppressLint("StateFlowValueCalledInComposition")
 @Composable
 fun AppNavigation(sharedViewModel: SharedViewModel){
     val navController = rememberNavController()
-    NavControllerProvider.navController = navController
+    sharedViewModel.navController.value = navController
 
     NavHost(navController = navController, startDestination = AppScreens.PrincipalScreen.route) {
         composable(route = AppScreens.PrincipalScreen.route) {
@@ -56,15 +53,15 @@ fun AppNavigation(sharedViewModel: SharedViewModel){
         composable(route = "vistadetalle/diplomados/{id}") {
             val id = it.arguments?.getString("id")
             BotFunctions.hideTopBar()
+            sharedViewModel.setId(id ?: "")
             sharedViewModel.setCurrentPage(navController.currentBackStackEntry?.destination?.route ?: "")
-
             VistaDetalleScreen(navController, id, sharedViewModel)
         }
         composable(route = "vistadetalle/carreras/{id}") {
             val id = it.arguments?.getString("id")
             BotFunctions.hideTopBar()
+            sharedViewModel.setId(id ?: "")
             sharedViewModel.setCurrentPage(navController.currentBackStackEntry?.destination?.route ?: "")
-
             VistaDetalleScreen(navController, id, sharedViewModel)
         }
     }

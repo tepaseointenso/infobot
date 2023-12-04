@@ -124,6 +124,7 @@ import java.util.UUID
 import java.util.concurrent.Executors
 
 
+@Suppress("IMPLICIT_CAST_TO_ANY")
 class MainActivity : AppCompatActivity(), NlpListener,OnRobotReadyListener,
     ConversationViewAttachesListener, WakeupWordListener, ActivityStreamPublishListener,
     TtsListener, OnBeWithMeStatusChangedListener, OnGoToLocationStatusChangedListener,
@@ -972,6 +973,8 @@ class MainActivity : AppCompatActivity(), NlpListener,OnRobotReadyListener,
 
 
     override fun onAsrResult(asrResult: String) {
+        val currentPage = sharedViewModel.currentPage.value
+        val id = sharedViewModel.currentId.value
         printLog("onAsrResult", "asrResult = $asrResult")
         try {
             val metadata = packageManager
@@ -983,111 +986,269 @@ class MainActivity : AppCompatActivity(), NlpListener,OnRobotReadyListener,
             e.printStackTrace()
             return
         }
-        when {
-            asrResult.equals("Hola", ignoreCase = true) -> {
-                robot.askQuestion("Hola, soy el infoBot de la PUCV, en que puedo ayudarte?")
-            }
-
-            asrResult.contains(
-                "Muestrame la lista de profesores",
-                ignoreCase = true
-            ) || asrResult.contains("Lista de profesores", ignoreCase = true)
-                    || asrResult.contains(
-                "Profesores",
-                ignoreCase = true
-            ) || asrResult.contains("¿Cuales son los profesores?", ignoreCase = true) -> {
-
-                robot.finishConversation()
-                sharedViewModel.navController.value?.navigate(AppScreens.AcademicosScreen.route)
-                robot.speak(
-                    create(
-                        "Estos son los académicos que imparten alguna asignatura o doctorado en la escuela de ingeniería informatica de la PUCV",
-                        false
-                    )
-                )
-            }
-
-            asrResult.contains("carreras",true)-> {
-                robot.finishConversation()
-                sharedViewModel.navController.value?.navigate(AppScreens.CarrerasScreen.route)
-                robot.speak(
-                    create(
-                        "Estas son las carreras y doctorados que actualmente se imparten en la escuela de ingeniería informatica de la PUCV",
-                        false
-                    )
-                )
-            }
-
-            asrResult.contains("Sígueme",true) || asrResult.contains("seguir", true) -> {
-                robot.finishConversation()
-                robot.beWithMe()
-                robot.speak(
-                    create(
-                        "De acuerdo",
-                        false
-                    )
-                )
-            }
-
-            asrResult.contains("mírame",true) || asrResult.contains("mirar", true) -> {
-                robot.finishConversation()
-                robot.constraintBeWith()
-                robot.speak(
-                    create(
-                        "De acuerdo",
-                        false
-                    )
-                )
-            }
-
-            asrResult.contains("para de moverte",true) || asrResult.contains("detener", true) -> {
-                robot.finishConversation()
-                robot.stopMovement()
-                robot.speak(
-                    create(
-                        "De acuerdo, dejaré de moverme",
-                        false
-                    )
-                )
-            }
-
-            asrResult.contains("go to home base") -> {
-                robot.finishConversation()
-                robot.goTo("home base")
-            }
-
-            asrResult.contains("No me sigas",true) -> {
-                robot.finishConversation()
-                robot.speak(
-                    create(
-                        "Ya bueno, pero no te enojes",
-                        false
-                    )
-                )
-                robot.stopMovement()
-
-            }
-
-
-            else -> {
-                val ttsStatusListener = object : TtsListener {
-                    override fun onTtsStatusChanged(ttsRequest: TtsRequest) {
-                        if (ttsRequest.status == TtsRequest.Status.COMPLETED){
-                            printLog("ESTADO SE COMPLETO", "status = $ttsRequest")
-
-                            robot.askQuestion("¿En que puedo ayudarte?")
-                            robot.removeTtsListener(this)
+        if (currentPage != null) {
+            when {
+                asrResult.contains("profesores", ignoreCase = true) -> {
+                    if (currentPage.contains("diplomados")){
+                        robot.finishConversation()
+                        val diplomado = listaDiplomados.find { it.id == id }
+                        if (diplomado != null) {
+                            val profesoresString = diplomado.profesores.joinToString(", ")
+                            robot.speak(create("Los profesores que imparten el ${diplomado.title} son: \n$profesoresString", false))
                         }
+
+                    }
+                    else{
+                        robot.finishConversation()
+                        sharedViewModel.navController.value?.navigate(AppScreens.AcademicosScreen.route)
+                        robot.speak(
+                            create(
+                                "Estos son los académicos que imparten alguna asignatura o doctorado en la escuela de ingeniería informatica de la PUCV",
+                                false
+                            )
+                        )
+                    }
+                }
+                asrResult.equals("Hola", ignoreCase = true) -> {
+                    robot.askQuestion("Hola, soy el infoBot de la PUCV, en que puedo ayudarte?")
+                }
+
+                asrResult.contains("Ingeniería en Informática",true)-> {
+                    robot.finishConversation()
+                    val id = "1"
+                    sharedViewModel.navController.value?.navigate("vistadetalle/carreras/$id")
+                    listaCarreras.find { it.id == id }?.let {
+                        robot.speak(
+                            create(
+                                "Aquí puedes encontrar información sobre la carrera de ${it.nombre}",
+                                false
+                            )
+                        )
+                    }
+                }
+                asrResult.contains("Ingeniería Civil Informática",true)-> {
+                    robot.finishConversation()
+                    val id = "2"
+                    listaCarreras.find { it.id == id }?.let {
+                        robot.speak(
+                            create(
+                                "Aquí puedes encontrar información sobre la carrera de ${it.nombre}",
+                                false
+                            )
+                        )
+                    }
+                    sharedViewModel.navController.value?.navigate("vistadetalle/carreras/$id")
+                }
+                asrResult.contains("Ingeniería civil en ciencia de datos",true)-> {
+                    robot.finishConversation()
+                    val id = "3"
+                    sharedViewModel.navController.value?.popBackStack()
+                    sharedViewModel.navController.value?.navigate("vistadetalle/carreras/$id")
+                    listaCarreras.find { it.id == id }?.let {
+                        robot.speak(
+                            create(
+                                "Aquí puedes encontrar información sobre la carrera de ${it.nombre}",
+                                false
+                            )
+                        )
+                    }
+                }
+                asrResult.contains("Ingeniería de ejecución informática",true)-> {
+                    robot.finishConversation()
+                    val id = "4"
+                    sharedViewModel.navController.value?.navigate("vistadetalle/carreras/$id")
+                    listaCarreras.find { it.id == id }?.let {
+                        robot.speak(
+                            create(
+                                "Aquí puedes encontrar información sobre la carrera de ${it.nombre}",
+                                false
+                            )
+                        )
                     }
                 }
 
-                robot.addTtsListener(ttsStatusListener)
-                robot.speak(
-                    create(
-                        "Lo siento no he entendido tu pregunta",
-                        showAnimationOnly = true
+
+                asrResult.contains("Big Data",true)-> {
+                    robot.finishConversation()
+                    val id = "1"
+                    sharedViewModel.navController.value?.navigate("vistadetalle/diplomados/$id")
+                    listaDiplomados.find { it.id == id }?.let {
+                        robot.speak(
+                            create(
+                                "Aquí puedes encontrar información sobre el diplomado de ${it.title}",
+                                false
+                            )
+                        )
+                    }
+                }
+                asrResult.contains("inteligencia artificial",true)-> {
+                    robot.finishConversation()
+                    val id = "2"
+                    sharedViewModel.navController.value?.navigate("vistadetalle/diplomados/$id")
+                    listaDiplomados.find { it.id == id }?.let {
+                        robot.speak(
+                            create(
+                                "Aquí puedes encontrar información sobre el diplomado de ${it.title}",
+                                false
+                            )
+                        )
+                    }
+                }
+                asrResult.contains("experiencia usuario",true)-> {
+                    robot.finishConversation()
+                    val id = "3"
+                    sharedViewModel.navController.value?.navigate("vistadetalle/diplomados/$id")
+                    listaDiplomados.find { it.id == id }?.let {
+                        robot.speak(
+                            create(
+                                "Aquí puedes encontrar información sobre el diplomado de ${it.title}",
+                                false
+                            )
+                        )
+                    }
+                }
+                asrResult.contains("experiencia consumidor",true)-> {
+                    robot.finishConversation()
+                    val id = "4"
+                    sharedViewModel.navController.value?.navigate("vistadetalle/diplomados/$id")
+                    listaDiplomados.find { it.id == id }?.let {
+                        robot.speak(
+                            create(
+                                "Aquí puedes encontrar información sobre el diplomado de ${it.title}",
+                                false
+                            )
+                        )
+                    }
+                }
+                asrResult.contains("ciberseguridad",true)-> {
+                    robot.finishConversation()
+                    val id = "5"
+                    sharedViewModel.navController.value?.navigate("vistadetalle/diplomados/$id")
+                    listaDiplomados.find { it.id == id }?.let {
+                        robot.speak(
+                            create(
+                                "Aquí puedes encontrar información sobre el ${it.title}",
+                                false
+                            )
+                        )
+                    }
+                }
+
+
+
+                asrResult.contains("carreras",true)-> {
+                    robot.finishConversation()
+                    sharedViewModel.navController.value?.navigate(AppScreens.CarrerasScreen.route)
+                    robot.speak(
+                        create(
+                            "Estas son las carreras que actualmente se imparten en la escuela de ingeniería informatica de la PUCV",
+                            false
+                        )
                     )
-                )
+                }
+
+                asrResult.contains("diplomados",true)-> {
+                    robot.finishConversation()
+                    sharedViewModel.navController.value?.navigate(AppScreens.DiplomadosScreen.route)
+                    robot.speak(
+                        create(
+                            "Estos son los diplomados que actualmente se imparten en la escuela de ingeniería informatica de la PUCV",
+                            false
+                        )
+                    )
+                }
+
+                asrResult.contains("Sígueme",true) || asrResult.contains("seguir", true) -> {
+                    robot.finishConversation()
+                    robot.beWithMe()
+                    robot.speak(
+                        create(
+                            "De acuerdo",
+                            false
+                        )
+                    )
+                }
+
+                asrResult.contains("inicio",true) -> {
+                    robot.finishConversation()
+                    sharedViewModel.navController.value?.navigate(AppScreens.PrincipalScreen.route)
+                }
+                asrResult.contains("evaluar",true) -> {
+                    robot.finishConversation()
+                    sharedViewModel.navController.value?.navigate(AppScreens.EvaluacionScreen.route)
+                    robot.speak(
+                        create(
+                            "Aquí puedes evaluar que te ha parecido mi atención para seguir mejorando.",
+                            false
+                        )
+                    )
+                }
+
+
+                asrResult.equals("cállate",true) || asrResult.equals("silencio", true)  || asrResult.contains("en nada", true) -> {
+                    robot.finishConversation()
+                }
+
+                asrResult.contains("mírame",true) || asrResult.contains("mirar", true) -> {
+                    robot.finishConversation()
+                    robot.constraintBeWith()
+                    robot.speak(
+                        create(
+                            "De acuerdo",
+                            false
+                        )
+                    )
+                }
+
+                asrResult.equals("para",true) || asrResult.contains("detener", true) -> {
+                    robot.finishConversation()
+                    robot.stopMovement()
+                    robot.speak(
+                        create(
+                            "De acuerdo, dejaré de moverme",
+                            false
+                        )
+                    )
+                }
+
+                asrResult.contains("go to home base") -> {
+                    robot.finishConversation()
+                    robot.goTo("home base")
+                }
+
+                asrResult.contains("No me sigas",true) -> {
+                    robot.finishConversation()
+                    robot.speak(
+                        create(
+                            "Perfecto, dejaré de seguirte",
+                            false
+                        )
+                    )
+                    robot.stopMovement()
+
+                }
+
+
+                else -> {
+                    val ttsStatusListener = object : TtsListener {
+                        override fun onTtsStatusChanged(ttsRequest: TtsRequest) {
+                            if (ttsRequest.status == TtsRequest.Status.COMPLETED){
+                                printLog("ESTADO SE COMPLETO", "status = $ttsRequest")
+
+                                robot.askQuestion("¿En que puedo ayudarte?")
+                                robot.removeTtsListener(this)
+                            }
+                        }
+                    }
+
+                    robot.addTtsListener(ttsStatusListener)
+                    robot.speak(
+                        create(
+                            "Lo siento no he entendido tu pregunta",
+                            showAnimationOnly = true
+                        )
+                    )
+                }
             }
         }
     }
