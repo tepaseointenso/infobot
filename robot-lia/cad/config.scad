@@ -146,9 +146,9 @@ EAR_R   = 18;                                 // radio del disco de las orejas
 
 LEG_X   = 45;             // separacion de cada pierna respecto al centro
 PELV_T  = 8;              // espesor de la placa pelvis
-// Cadera: cresta a los costados, mas ancha que la cintura. 212 mm entra
-// en una cama de 220 mm sin brim. Poco espesor en Y: de perfil no hay bulbo.
-HIP_W       = 212;        // ancho de la cresta, de bulbo a bulbo
+// Cadera triangular: la punta de cada cresta es el ancho maximo. 212 mm
+// entra en una cama de 220 mm sin brim. Poco espesor en Y.
+HIP_W       = 212;        // ancho de punta a punta
 // Hueco por el que se mueve el mecanismo de cada pierna. Tiene que quedar
 // dentro de la piel (HIP_W) y fuera del barrido del servo de roll.
 HUECO_W = 102;

@@ -154,15 +154,20 @@ module en_caderas() {
     mirror([1, 0, 0]) translate([LEG_X, 0, Z_HIP]) children();
 }
 
-module elipsoide(r) scale(r) sphere(r = 1);
-
-// La cadera se marca a los lados: nace en la cintura y se cierra sobre el muslo.
-// Poco espesor en Y para que de perfil no aparezca un bulbo suelto.
+// Triangulo de lado, unido a la cintura por un puente que pasa por
+// encima del hueco. La punta es el ancho maximo. Poco espesor en Y.
 module caderas_forma() {
-    rx = HIP_W / 2 - 90;
-    for (sx = [-1, 1]) hull() {
-        translate([sx * 64, 0, 77]) cube([10, 36, 5], center = true);
-        translate([sx * 90, 0, 50]) elipsoide([rx, 18, 22]);
+    punta = HIP_W / 2 - 2;
+    for (sx = [-1, 1]) {
+        hull() {
+            translate([sx * 56, 0, 77]) cube([16, 14, 4], center = true);
+            translate([sx * 92, 0, 73]) cube([6, 8, 3], center = true);
+        }
+        hull() {
+            translate([sx * 94, 0, 70]) cube([5, 10, 6], center = true);
+            translate([sx * 94, 0, 36]) cube([5, 10, 6], center = true);
+            translate([sx * punta, 0, 52]) cube([4, 8, 4], center = true);
+        }
     }
 }
 
@@ -170,7 +175,9 @@ module caderas_forma() {
 module hueco_pierna(sgn = 1) {
     hull() {
         translate([sgn * LEG_X, HUECO_Y, HUECO_Z0]) cube([HUECO_W, HUECO_D, 1], center = true);
-        translate([sgn * LEG_X, HUECO_Y, HUECO_Z1]) cube([HUECO_W - 10, HUECO_D - 14, 1], center = true);
+        // Arriba mas angosto que la base, pero con aire para el roll a -15°,
+        // que roza la arista interna de la punta.
+        translate([sgn * LEG_X, HUECO_Y, HUECO_Z1]) cube([HUECO_W - 14, HUECO_D - 14, 1], center = true);
     }
 }
 
