@@ -2,25 +2,23 @@
 
 Lia es un robot social humanoide inspirado en [Abi de Andromeda Robotics](https://andromedarobotics.ai/): cara amable con ojos en pantalla, cabeza que gira y asiente, brazos expresivos para saludar o abrazar y dos piernas con las que se para, se agacha, cambia el peso de pie y da pasos lentos. No es una copia de Abi. Es un diseño propio de unos 64 cm, pensado para imprimirse en una impresora doméstica de 220 × 220 mm y armarse con servos de hobby.
 
-La silueta es la de una mujer: el pecho mide 150 mm, la cintura se estrecha a 138 mm y la cadera se abre en triángulo hasta una punta de 212 mm, con los muslos saliendo por debajo. El ancho extra está en los costados, así que las piernas siguen teniendo su recorrido.
+El cuerpo se viste por bloques de color, en la línea de Abi: cara oscura con ojos violeta, gorra clara, chaqueta rosa, cadera naranja ancha como un short y piernas en verde y violeta. Cada pieza se imprime en su color de filamento. Sigue siendo un diseño propio de unos 64 cm, no una réplica de Abi (ella mide cerca de 120 cm y lleva el mecanismo tapado). El pecho mide 150 mm, la cintura 138 mm y la cadera 208 mm, con los muslos saliendo por debajo.
 
 <p align="center">
   <img src="imagenes/lia_frente.png" width="23%" alt="Lia de frente">
-  <img src="imagenes/lia_cadera.png" width="23%" alt="Lia con los brazos arriba: la cadera termina en una punta triangular">
+  <img src="imagenes/lia_cadera.png" width="23%" alt="Lia con la cadera naranja y los brazos arriba">
   <img src="imagenes/lia_tres_cuartos.png" width="23%" alt="Lia en tres cuartos">
   <img src="imagenes/lia_trasera.png" width="23%" alt="Lia por detrás">
 </p>
 <p align="center">
   <img src="imagenes/lia_saludo.png" width="23%" alt="Lia saludando">
   <img src="imagenes/lia_paso.png" width="23%" alt="Lia dando un paso">
-  <img src="imagenes/lia_agachada.png" width="23%" alt="Lia agachada">
-  <img src="imagenes/lia_perfil.png" width="23%" alt="Lia de perfil">
 </p>
 
 | | |
 |---|---|
 | Altura | ~643 mm de pie |
-| Pecho / cintura / cadera | 150 / 138 / 212 mm |
+| Pecho / cintura / cadera | 150 / 138 / 208 mm |
 | Ancho con brazos | 270 mm |
 | Grados de libertad | 18 (cuello pan/tilt, 3 por brazo, 5 por pierna) |
 | Servos | 10 × DS3218MG (piernas), 4 × MG996R, 4 × MG90S |
@@ -100,11 +98,12 @@ Las piezas de `stl/` ya están orientadas: importa y lamina. Configuración base
 | `cuello` | 1 | 40 % | no | |
 | `cuello_tapa` | 1 | 40 % | no | |
 | `cabeza` | 1 | 15 % | sí, tipo árbol | solo para el domo trasero |
-| `cara` | 1 | 15 % | no | el frente queda liso contra la cama |
+| `cara` | 1 | 15 % | no | el frente queda liso contra la cama; filamento negro |
+| `gorra` | 1 | 15 % | no | se pega arriba de la cabeza; filamento verde claro |
 | `hombro_der` / `hombro_izq` | 1 + 1 | 40 % | no | |
 | `brazo_der` / `brazo_izq` | 1 + 1 | 40 % | no | |
 | `antebrazo_der` / `antebrazo_izq` | 1 + 1 | 30 % | no | |
-| `pelvis` | 1 | 30 % | sí, tipo árbol | cara superior en la cama; el soporte va bajo las puntas de la cadera |
+| `pelvis` | 1 | 30 % | sí, tipo árbol | cara superior en la cama; el soporte va bajo el short de la cadera. Filamento naranja |
 | `cadera_der` / `cadera_izq` | 1 + 1 | 40 % | sí, solo en la cama | apoyada sobre la cara trasera |
 | `pierna_der` / `pierna_izq` | 2 + 2 | 40 % | sí, bajo el travesaño | muslo y tibia son la misma pieza |
 | `tobillo_der` / `tobillo_izq` | 1 + 1 | 40 % | no | de pie |

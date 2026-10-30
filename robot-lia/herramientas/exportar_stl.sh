@@ -10,7 +10,7 @@ mkdir -p "$SALIDA"
 
 PIEZAS=("$@")
 if [ ${#PIEZAS[@]} -eq 0 ]; then
-  PIEZAS=(torso cuello cuello_tapa cabeza cara
+  PIEZAS=(torso cuello cuello_tapa cabeza cara gorra
           hombro_der hombro_izq brazo_der brazo_izq antebrazo_der antebrazo_izq
           pelvis cadera_der cadera_izq pierna_der pierna_izq tobillo_der tobillo_izq
           pie_der pie_izq tapa_servo

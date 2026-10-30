@@ -41,13 +41,13 @@ module antebrazo() {
 // flexion > 0 = brazo hacia adelante, abduccion > 0 = hacia afuera, codo > 0 = flexiona.
 module brazo_ensamble(flexion = 0, abduccion = 0, codo = 0, servos = true) {
     translate([TORSO_W / 2 + MG996R[S_HORNH], 0, Z_S]) rotate([-flexion, 0, 0]) {
-        color(C_ACCENT) hombro();
+        color(VARIANTE == "patas" ? C_CADERA : C_ACCENT) hombro();
         if (servos) en_abduccion() servo_modelo(MG90S);
         translate([LINK_L / 2, -LINK_D / 2 - MG90S[S_HORNH], ROLL_Z]) rotate([0, -abduccion, 0]) {
-            color(C_SHELL) brazo();
+            color(VARIANTE == "patas" ? C_CHAQUETA : C_SHELL) brazo();
             if (servos) en_codo() servo_modelo(MG90S);
             translate([UA_W / 2 + MG90S[S_HORNH], -UA_D / 2, -UA_LEN]) rotate([-codo, 0, 0])
-                color(C_ACCENT) antebrazo();
+                color(VARIANTE == "patas" ? C_CANILLA : C_ACCENT) antebrazo();
         }
     }
 }

@@ -38,7 +38,7 @@ module ensamble() {
     if (VARIANTE == "patas") {
         translate([0, 0, -Z_SUELO]) {
             cuerpo_superior();
-            color(C_SHELL) pelvis();
+            color(C_CADERA) pelvis();
             pierna_ensamble(pierna_izq[0], pierna_izq[1], pierna_izq[2], pierna_izq[3], pierna_izq[4], mostrar_servos);
             mirror([1, 0, 0]) pierna_ensamble(pierna_der[0], pierna_der[1], pierna_der[2], pierna_der[3], pierna_der[4], mostrar_servos);
         }
@@ -50,16 +50,17 @@ module ensamble() {
 }
 
 module cuerpo_superior() {
-    color(C_SHELL) torso();
+    color(VARIANTE == "patas" ? C_CHAQUETA : C_SHELL) torso();
     if (mostrar_servos) { en_pan() servo_modelo(MG996R); en_hombros() servo_modelo(MG996R); }
 
     translate([0, 0, Z_NECK]) rotate([0, 0, pan]) {
-        color(C_ACCENT) cuello();
-        color(C_ACCENT) cuello_tapa();
+        color(VARIANTE == "patas" ? C_UNION : C_ACCENT) cuello();
+        color(VARIANTE == "patas" ? C_UNION : C_ACCENT) cuello_tapa();
         if (mostrar_servos) en_tilt() servo_modelo(MG996R);
         translate([0, 0, NECK_AX]) rotate([-tilt, 0, 0]) {
-            color(C_SHELL) cabeza();
-            color(C_SHELL) cara();
+            color(VARIANTE == "patas" ? C_GORRA : C_SHELL) cabeza();
+            color(VARIANTE == "patas" ? C_CARA : C_SHELL) cara();
+            if (VARIANTE == "patas") color(C_GORRA) gorra();
             ojos_modelo();
         }
     }
@@ -78,6 +79,7 @@ module imprimir(p) {
     else if (p == "cuello_tapa") translate([0, 0, NECK_W / 2 + CAP_T]) rotate([0, -90, 0]) cuello_tapa();
     else if (p == "cabeza")     translate([0, 0, -Y_CUT]) rotate([90, 0, 0]) cabeza();
     else if (p == "cara")       translate([0, 0, -HEAD_Y0]) rotate([90, 0, 0]) cara();
+    else if (p == "gorra")      translate([0, 0, -(HEAD_Z0 + HEAD_H - 14)]) gorra();
     else if (p == "hombro_izq") translate([0, 0, LINK_D / 2]) rotate([-90, 0, 0]) hombro();
     else if (p == "brazo_izq")  translate([0, 0, UA_W / 2]) rotate([0, -90, 0]) brazo();
     else if (p == "antebrazo_izq") rotate([0, -90, 0]) antebrazo();
@@ -108,8 +110,8 @@ module piezas() {
            ["tapa_servo", [-200, 140], C_ACCENT]]
         : [["base", [-110, 120], C_SHELL], ["base_tapa", [110, 120], C_ACCENT]];
     for (p = inferior) translate([p[1][0], p[1][1], 0]) color(p[2]) imprimir(p[0]);
-    lista = [["torso", [-110, -40], C_SHELL], ["cabeza", [80, -30], C_SHELL],
-             ["cara", [260, -30], C_SHELL], ["cuello", [-250, -40], C_ACCENT],
+    lista = [["torso", [-110, -40], C_CHAQUETA], ["cabeza", [80, -30], C_GORRA],
+             ["cara", [260, -30], C_CARA], ["gorra", [180, -90], C_GORRA], ["cuello", [-250, -40], C_UNION],
              ["cuello_tapa", [-250, 40], C_ACCENT],
              ["hombro_der", [-40, -170], C_ACCENT], ["hombro_izq", [0, -170], C_ACCENT],
              ["brazo_der", [70, -170], C_SHELL], ["brazo_izq", [70, -210], C_SHELL],

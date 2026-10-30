@@ -154,20 +154,12 @@ module en_caderas() {
     mirror([1, 0, 0]) translate([LEG_X, 0, Z_HIP]) children();
 }
 
-// Triangulo de lado, unido a la cintura por un puente que pasa por
-// encima del hueco. La punta es el ancho maximo. Poco espesor en Y.
+// Cadera ancha, como un short: nace en la cintura, se abre a los lados
+// y los muslos salen por debajo. El hueco de cada pierna la recorta.
 module caderas_forma() {
-    punta = HIP_W / 2 - 2;
-    for (sx = [-1, 1]) {
-        hull() {
-            translate([sx * 56, 0, 77]) cube([16, 14, 4], center = true);
-            translate([sx * 92, 0, 73]) cube([6, 8, 3], center = true);
-        }
-        hull() {
-            translate([sx * 94, 0, 70]) cube([5, 10, 6], center = true);
-            translate([sx * 94, 0, 36]) cube([5, 10, 6], center = true);
-            translate([sx * punta, 0, 52]) cube([4, 8, 4], center = true);
-        }
+    hull() {
+        translate([0, -6, 74]) cube([WAIST_W - 4, 82, 14], center = true);
+        translate([0, -8, 46]) cube([HIP_W - 4, 96, 32], center = true);
     }
 }
 
@@ -228,18 +220,18 @@ module pelvis() {
 // ---------------------------------------------------------------------------
 module pierna_ensamble(cr = 0, cp = 0, ro = 0, tp = 0, tr = 0, servos = true) {
     translate([LEG_X, 0, Z_HIP]) rotate([0, -cr, 0]) {
-        color(C_ACCENT) cadera();
+        color(C_UNION) cadera();
         if (servos) { cad_roll_blk() bloque_servo_modelo(); cad_pitch_blk() bloque_servo_modelo(); }
         translate([0, 0, -CAD_DZ]) rotate([-cp, 0, 0]) {
-            color(C_SHELL) pierna();
+            color(C_MUSLO) pierna();
             if (servos) seg_blk() bloque_servo_modelo();
             translate([0, 0, -SEG_L]) rotate([ro, 0, 0]) {
-                color(C_SHELL) pierna();
+                color(C_CANILLA) pierna();
                 if (servos) seg_blk() bloque_servo_modelo();
                 translate([0, 0, -SEG_L]) rotate([-tp, 0, 0]) {
-                    color(C_ACCENT) tobillo();
+                    color(C_BOTA) tobillo();
                     if (servos) tob_roll_blk() bloque_servo_modelo();
-                    translate([0, 0, -TOB_DZ]) rotate([0, -tr, 0]) color(C_SHELL) pie();
+                    translate([0, 0, -TOB_DZ]) rotate([0, -tr, 0]) color(C_MUSLO) pie();
                 }
             }
         }

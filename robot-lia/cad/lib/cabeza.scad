@@ -99,11 +99,21 @@ module cara() {
     }
 }
 
+// Cúpula clara que se apoya sobre la cabeza. Se imprime aparte y se pega.
+module gorra() {
+    translate([0, -6, HEAD_Z0 + HEAD_H - 10]) hull() {
+        cube([HEAD_W - 28, 46, 8], center = true);
+        translate([0, -4, 14]) cube([HEAD_W - 48, 30, 6], center = true);
+    }
+}
+
 module ojos_modelo() {
     for (sx = [-1, 1]) translate([sx * EYE_DX, HEAD_Y0 + WALL + 0.2, EYE_Z]) {
         color("#111") cyl_y(EYE_PCB - 0.5, 0, 3.5);
-        color("#7fd6ff") translate([0, -0.3, 0]) cyl_y(EYE_WIN - 1, 0, 0.3);
-        color("#0b1d2a") translate([0, -0.5, -2]) cyl_y(14, 0, 0.3);
-        color("white") translate([4, -0.7, 4]) cyl_y(4, 0, 0.3);
+        color("white") translate([0, -0.6, 0]) scale([1.05, 0.12, 1.22]) sphere(d = EYE_WIN - 2);
+        // el cilindro crece hacia -Y, que es hacia afuera de la cara
+        color(C_IRIS) cyl_y(15, -3.4, -2.4);
+        color("#111") cyl_y(7, -3.9, -3.3);
+        color("white") cyl_y(2.6, -4.15, -3.85);
     }
 }

@@ -177,3 +177,13 @@ C_SHELL  = "#f4f1ea";
 C_ACCENT = "#8cc5d1";
 C_FACE   = "#2b2d31";
 C_SERVO  = "#3a3a3a";
+// Paleta de personaje, cerca de Abi: bloques de color, uniones negras.
+C_GORRA    = "#c6ef4a";
+C_CARA     = "#16161a";
+C_IRIS     = "#7a4dff";
+C_CHAQUETA = "#ff4d9a";
+C_CADERA   = "#ff8a1f";
+C_MUSLO    = "#b6e84a";
+C_CANILLA  = "#7d5bd0";
+C_BOTA     = "#ff5fa8";
+C_UNION    = "#1a1a1a";
