@@ -1,5 +1,6 @@
 // ============================================================================
-//  Lia - robot companera: control de 8 servos con ESP32 + PCA9685
+//  Lia - robot companera: control de 8 servos (escritorio) o 18 (con piernas)
+//  con ESP32 + PCA9685
 //
 //  Monitor serie a 115200 baudios, fin de linea "nueva linea". Escribe "ayuda".
 // ============================================================================
@@ -13,6 +14,9 @@
 #endif
 
 Adafruit_PWMServoDriver pca(PCA9685_DIR);
+#if CON_PATAS
+Adafruit_PWMServoDriver pca2(PCA9685_DIR2);
+#endif
 
 struct Articulacion {
   float actual;
@@ -46,14 +50,28 @@ uint16_t gradosAMicros(uint8_t i, float grados) {
   return (uint16_t)constrain(us, (float)US_MIN, (float)US_MAX);
 }
 
+void pulso(uint8_t canal, uint16_t us) {
+#if CON_PATAS
+  if (canal >= 16) { pca2.writeMicroseconds(canal - 16, us); return; }
+#endif
+  pca.writeMicroseconds(canal, us);
+}
+
+void apagarCanal(uint8_t canal) {
+#if CON_PATAS
+  if (canal >= 16) { pca2.setPWM(canal - 16, 0, 4096); return; }
+#endif
+  pca.setPWM(canal, 0, 4096);  // salida totalmente apagada
+}
+
 void escribirServo(uint8_t i) {
   if (!art[i].activa) return;
-  pca.writeMicroseconds(CONFIG_ART[i].canal, gradosAMicros(i, art[i].actual));
+  pulso(CONFIG_ART[i].canal, gradosAMicros(i, art[i].actual));
 }
 
 void relajar(uint8_t i) {
   art[i].activa = false;
-  pca.setPWM(CONFIG_ART[i].canal, 0, 4096);  // salida totalmente apagada
+  apagarCanal(CONFIG_ART[i].canal);
 }
 
 void mover(uint8_t i, float grados, float vel = -1) {
@@ -86,12 +104,20 @@ bool todasEnObjetivo() {
 }
 
 void aplicarPose(const int16_t *pose, float vel = -1) {
-  for (uint8_t i = 0; i < N_ART; i++)
+  for (uint8_t i = 0; i < N_SUP; i++)
     if (pose[i] != MANTENER) mover(i, pose[i], vel);
 }
 
+void aplicarPatas(const int16_t *patas, float vel = -1) {
+#if CON_PATAS
+  for (uint8_t i = 0; i < N_PAT; i++)
+    if (patas[i] != MANTENER) mover(N_SUP + i, patas[i], vel);
+#endif
+}
+
+// Solo el cuerpo superior: las piernas se quedan donde estan al terminar un gesto.
 void poseReposo() {
-  for (uint8_t i = 0; i < N_ART; i++) mover(i, CONFIG_ART[i].reposo);
+  for (uint8_t i = 0; i < N_SUP; i++) mover(i, CONFIG_ART[i].reposo);
 }
 
 // ---------------------------------------------------------------------------
@@ -115,6 +141,7 @@ void actualizarGesto(uint32_t ahora) {
   }
   const PasoGesto &p = gestoActual->pasos[pasoGesto++];
   aplicarPose(p.pose, p.velocidad > 0 ? p.velocidad : -1);
+  if (p.conPatas) aplicarPatas(p.patas, p.velocidad > 0 ? p.velocidad : -1);
 #if USAR_OJOS
   if (p.expresion != EXP_MANTENER) ojosExpresion((Expresion)p.expresion);
 #endif
@@ -167,8 +194,16 @@ void imprimirAyuda() {
     "  ayuda                    esta lista\n"
     "  estado                   angulos actuales y objetivos\n"
     "  j <art> <grados>         mover una articulacion (nombre o numero)\n"
-    "  pose <nombre>            reposo | brazos_arriba | abrazo\n"
-    "  gesto <nombre>           saludar | asentir | negar | abrazar | pensar | bailar | feliz\n"
+    "  pose <nombre>            reposo | brazos_arriba | abrazo"
+#if CON_PATAS
+    " | de_pie | recta | agachada"
+#endif
+    "\n"
+    "  gesto <nombre>           saludar | asentir | negar | abrazar | pensar | bailar | feliz"
+#if CON_PATAS
+    "\n                           agacharse | balancear | caminar (experimental)"
+#endif
+    "\n"
     "  vel <factor>             multiplicador de velocidad (0.2 - 2.0)\n"
     "  vida on|off              movimientos espontaneos\n"
     "  montaje                  todos los servos a la pose de reposo (para fijar bocinas)\n"
@@ -215,6 +250,7 @@ void procesarComando(String linea) {
     if (!p) { Serial.println(F("pose desconocida")); return; }
     gestoActual = nullptr;
     aplicarPose(p->valores);
+    if (p->conPatas) aplicarPatas(p->patas);
   } else if (cmd == "gesto") {
     const Gesto *g = buscarGesto(resto.c_str());
     if (!g) { Serial.println(F("gesto desconocido")); return; }
@@ -241,10 +277,16 @@ void procesarComando(String linea) {
     int us = constrain(resto.substring(sp2 + 1).toInt(), US_MIN, US_MAX);
     for (uint8_t i = 0; i < N_ART; i++)
       if (CONFIG_ART[i].canal == canal) art[i].activa = false;
-    pca.writeMicroseconds(canal, us);
+    pulso(canal, us);
     Serial.printf("canal %d = %d us\n", canal, us);
   } else if (cmd == "relajar") {
     gestoActual = nullptr;
+#if CON_PATAS
+    if (resto != "ya") {
+      Serial.println(F("Lia se va a caer: sostenla y escribe 'relajar ya'"));
+      return;
+    }
+#endif
     for (uint8_t i = 0; i < N_ART; i++) relajar(i);
     Serial.println(F("servos relajados"));
 #if USAR_OJOS
@@ -281,9 +323,14 @@ void setup() {
   pca.begin();
   pca.setOscillatorFrequency(27000000);
   pca.setPWMFreq(SERVO_HZ);
+#if CON_PATAS
+  pca2.begin();
+  pca2.setOscillatorFrequency(27000000);
+  pca2.setPWMFreq(SERVO_HZ);
+#endif
 
   // Arranque en reposo; se activan uno a uno para no exigir picos de corriente.
-  for (uint8_t i = 0; i < N_ART; i++) pca.setPWM(CONFIG_ART[i].canal, 0, 4096);
+  for (uint8_t i = 0; i < N_ART; i++) apagarCanal(CONFIG_ART[i].canal);
   digitalWrite(PIN_OE, LOW);
   for (uint8_t i = 0; i < N_ART; i++) {
     art[i].actual = art[i].objetivo = CONFIG_ART[i].reposo;
@@ -298,6 +345,10 @@ void setup() {
 #endif
   randomSeed(esp_random());
   Serial.println(F("\nLia lista. Escribe 'ayuda'."));
+#if CON_PATAS
+  const Pose *dePie = buscarPose("de_pie");
+  aplicarPatas(dePie->patas, 30);
+#endif
   iniciarGesto(buscarGesto("saludar"));
 }
 

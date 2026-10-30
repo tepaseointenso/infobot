@@ -10,12 +10,21 @@ mkdir -p "$SALIDA"
 
 PIEZAS=("$@")
 if [ ${#PIEZAS[@]} -eq 0 ]; then
-  PIEZAS=(base base_tapa torso cuello cuello_tapa cabeza cara
-          hombro_der hombro_izq brazo_der brazo_izq antebrazo_der antebrazo_izq)
+  PIEZAS=(torso cuello cuello_tapa cabeza cara
+          hombro_der hombro_izq brazo_der brazo_izq antebrazo_der antebrazo_izq
+          pelvis cadera_der cadera_izq pierna_der pierna_izq tobillo_der tobillo_izq
+          pie_der pie_izq tapa_servo
+          base base_tapa)
 fi
 
+exportar() {  # pieza archivo [variante]
+  echo ">> $2"
+  openscad --hardwarnings -D "parte=\"$1\"" -D "VARIANTE=\"${3:-patas}\"" -o "$SALIDA/$2.stl" "$CAD"
+  python3 "$RAIZ/herramientas/stl_binario.py" "$SALIDA/$2.stl"
+}
+
 for p in "${PIEZAS[@]}"; do
-  echo ">> $p"
-  openscad --hardwarnings -D "parte=\"$p\"" -o "$SALIDA/$p.stl" "$CAD"
-  python3 "$RAIZ/herramientas/stl_binario.py" "$SALIDA/$p.stl"
+  exportar "$p" "$p"
 done
+# el torso de escritorio no lleva el interruptor ni la salida de carga traseros
+if [ $# -eq 0 ]; then exportar torso torso_escritorio escritorio; fi

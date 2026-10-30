@@ -68,5 +68,10 @@ module torso() {
         // paso de cables: cabeza (arriba) y brazos (costados, detras del hombro)
         translate([-36, 22, Z_T - 10]) cylinder(d = 18, h = 20);
         for (sx = [-1, 1]) translate([sx * TORSO_W / 2, 40, Z_S - 10]) rotate([0, 90, 0]) cylinder(d = 14, h = 20, center = true);
+        // version con patas: interruptor y salida del cable de carga de la bateria
+        if (VARIANTE == "patas") {
+            translate([-30, TORSO_D / 2 - 6, Z_T0 + 30]) cyl_y(12.4, 0, 12);
+            translate([25, TORSO_D / 2 - 6, Z_T0 + 30]) rbox_y([-15, 0, -7], [15, 12, 7], 3);
+        }
     }
 }

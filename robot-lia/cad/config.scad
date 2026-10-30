@@ -34,12 +34,16 @@ S_PILOT = 16;  // agujero piloto para los tornillos de las orejas (autorroscante
 //             L     W     H    tabL  tabT  tabD  hdx   hdy  hd   soff  sh   sd   hornH hornD hornR n  pilot
 MG996R = [ 40.7, 19.7, 36.9, 54.0, 2.5,  8.2, 49.5, 10.0, 4.3, 10.2, 6.0, 5.8,  9.0, 24.0,  8.0, 4, 2.6 ];
 MG90S  = [ 22.8, 12.2, 22.5, 32.5, 2.5,  4.1, 27.8,  0.0, 2.2,  6.0, 5.5, 4.8,  7.0, 20.0,  7.0, 2, 1.6 ];
+DS3218 = [ 40.0, 20.0, 37.2, 54.5, 2.5,  8.8, 49.5, 10.0, 4.3, 10.0, 4.0, 5.9,  8.0, 24.0,  8.0, 4, 2.6 ];
 
 HORN_SCREW_PILOT = 1.8;  // tornillo M2 autorroscante de bocina
 HORN_SCREW_PASS  = 2.4;  // paso libre para M2
 
+// "patas" = humanoide con piernas; "escritorio" = torso sobre la base cilindrica
+VARIANTE = "patas";
+
 // ---------------------------------------------------------------------------
-//  Base (electronica)
+//  Base (electronica, solo variante escritorio)
 // ---------------------------------------------------------------------------
 BASE_R   = 95;
 BASE_H   = 80;
@@ -58,7 +62,7 @@ TORSO_CH = 20;     // chaflan superior a 45 grados (se imprime boca abajo sin so
 Z_T0     = BASE_H;
 Z_T      = 240;    // cara superior del torso
 Z_S      = Z_T - 42;   // altura del eje de los hombros
-TORSO_BOSS = [[52, 32], [-52, 32], [52, -32], [-52, -32]];
+TORSO_BOSS = [[52, 42], [-52, 42], [52, -42], [-52, -42]];
 
 // ---------------------------------------------------------------------------
 //  Cuello (pan + tilt)
@@ -115,6 +119,41 @@ UA_LEN  = 70;             // eje hombro -> eje codo
 FA_T    = 16;             // antebrazo + mano
 FA_W    = 22;
 FA_LEN  = 62;
+
+// ---------------------------------------------------------------------------
+//  Piernas (5 servos DS3218 por pierna)
+//  Cada servo va en un "bloque" con tapa trasera; la pieza siguiente lo abraza
+//  con una horquilla: oreja atornillada a la bocina y oreja con eje loco M4.
+// ---------------------------------------------------------------------------
+SP      = DS3218;
+BLK_M   = 5;              // pared alrededor de las orejas del servo
+BLK_W   = 46;             // profundidad del bloque (cara del eje -> cara de la tapa)
+BLK_D   = SP[S_W] + 2 * (CLR + 6.7);
+BLK_CAP = 6;
+BLK_C   = -(SP[S_L] / 2 - SP[S_SOFF]);
+BLK_Z0  = BLK_C - SP[S_TABL] / 2 - CLR - BLK_M;
+BLK_Z1  = BLK_C + SP[S_TABL] / 2 + CLR + BLK_M;
+BLK_R   = norm([BLK_Z0, BLK_D / 2]);           // radio barrido por el bloque al girar
+BLK_LIBRE = BLK_R + 1.5;
+X_S     = (BLK_W + BLK_CAP + 1 - SP[S_HORNH]) / 2;   // cara del eje: horquilla centrada
+EAR_IN  = X_S + SP[S_HORNH];                  // cara interior de cada oreja de horquilla
+EAR_R   = 18;                                 // radio del disco de las orejas
+
+LEG_X   = 45;             // separacion de cada pierna respecto al centro
+PELV_T  = 8;              // espesor de la placa pelvis
+PELV_LIBRE = 29;          // eje roll de cadera -> cara inferior de la pelvis
+Z_HIP   = Z_T0 - PELV_T - PELV_LIBRE;
+CAD_DZ  = BLK_D / 2 + EAR_R + 1;             // roll de cadera -> pitch de cadera
+CAD_YF  = BLK_Z1 - BLK_W;                     // cara del eje del servo roll de cadera
+SEG_L   = 75;             // muslo y tibia (eje a eje)
+TOB_DZ  = BLK_LIBRE + BLK_D / 2 + 2;          // pitch de tobillo -> roll de tobillo
+TOB_YF  = -(BLK_W + BLK_CAP) / 2;
+SOLE_Z  = 32.5;           // roll de tobillo -> cara superior de la suela
+SOLE_T  = 6;
+FOOT_X  = 40;             // medio ancho del pie
+FOOT_Y0 = -75;            // punta
+FOOT_Y1 = 55;             // talon
+Z_SUELO = Z_HIP - CAD_DZ - 2 * SEG_L - TOB_DZ - SOLE_Z - SOLE_T;
 
 // ---------------------------------------------------------------------------
 //  Colores del ensamble

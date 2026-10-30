@@ -15,9 +15,13 @@ include <lib/torso.scad>
 include <lib/cuello.scad>
 include <lib/cabeza.scad>
 include <lib/brazos.scad>
+include <lib/piernas.scad>
 
-// [ensamble, base, base_tapa, torso, cuello, cuello_tapa, cabeza, cara,
-//  hombro_der, hombro_izq, brazo_der, brazo_izq, antebrazo_der, antebrazo_izq]
+// ensamble | piezas | una pieza:
+//   torso, cuello, cuello_tapa, cabeza, cara, hombro_*, brazo_*, antebrazo_*
+//   con patas:  pelvis, cadera_*, pierna_* (x2 por lado), tobillo_*, pie_*, tapa_servo (x10)
+//   escritorio: base, base_tapa
+//   (* = izq o der)
 parte = "ensamble";
 
 // Pose del ensamble (grados)
@@ -25,11 +29,27 @@ pan = 0;
 tilt = 0;
 der = [0, 0, 0];   // [flexion, abduccion, codo] brazo derecho
 izq = [0, 0, 0];
+// [roll cadera, pitch cadera, rodilla, pitch tobillo, roll tobillo]
+pierna_der = [0, 0, 0, 0, 0];
+pierna_izq = [0, 0, 0, 0, 0];
 mostrar_servos = true;
 
 module ensamble() {
-    color(C_SHELL) base();
-    color(C_ACCENT) base_tapa();
+    if (VARIANTE == "patas") {
+        translate([0, 0, -Z_SUELO]) {
+            cuerpo_superior();
+            color(C_ACCENT) pelvis();
+            pierna_ensamble(pierna_izq[0], pierna_izq[1], pierna_izq[2], pierna_izq[3], pierna_izq[4], mostrar_servos);
+            mirror([1, 0, 0]) pierna_ensamble(pierna_der[0], pierna_der[1], pierna_der[2], pierna_der[3], pierna_der[4], mostrar_servos);
+        }
+    } else {
+        color(C_SHELL) base();
+        color(C_ACCENT) base_tapa();
+        cuerpo_superior();
+    }
+}
+
+module cuerpo_superior() {
     color(C_SHELL) torso();
     if (mostrar_servos) { en_pan() servo_modelo(MG996R); en_hombros() servo_modelo(MG996R); }
 
@@ -64,13 +84,31 @@ module imprimir(p) {
     else if (p == "hombro_der")    mirror([1, 0, 0]) imprimir("hombro_izq");
     else if (p == "brazo_der")     mirror([1, 0, 0]) imprimir("brazo_izq");
     else if (p == "antebrazo_der") mirror([1, 0, 0]) imprimir("antebrazo_izq");
+    else if (p == "pelvis")     rotate([180, 0, 0]) translate([0, 0, -Z_T0]) pelvis();
+    else if (p == "cadera_izq") translate([0, 0, BLK_Z1]) rotate([-90, 0, 0]) cadera();
+    else if (p == "pierna_izq") translate([0, 0, SEG_L - BLK_Z0]) pierna();
+    else if (p == "tobillo_izq") translate([0, 0, TOB_DZ + BLK_D / 2]) tobillo();
+    else if (p == "pie_izq")    translate([0, 0, SOLE_Z + SOLE_T]) pie();
+    else if (p == "tapa_servo") translate([0, 0, BLK_W + BLK_CAP]) rotate([0, -90, 0]) tapa_servo();
+    else if (p == "cadera_der")  mirror([1, 0, 0]) imprimir("cadera_izq");
+    else if (p == "pierna_der")  mirror([1, 0, 0]) imprimir("pierna_izq");
+    else if (p == "tobillo_der") mirror([1, 0, 0]) imprimir("tobillo_izq");
+    else if (p == "pie_der")     mirror([1, 0, 0]) imprimir("pie_izq");
     else echo(str("Parte desconocida: ", p));
 }
 
 // Todas las piezas en orientacion de impresion, para revisar de un vistazo.
 module piezas() {
-    lista = [["base", [-110, 120], C_SHELL], ["base_tapa", [110, 120], C_ACCENT],
-             ["torso", [-110, -40], C_SHELL], ["cabeza", [80, -30], C_SHELL],
+    inferior = VARIANTE == "patas"
+        ? [["pelvis", [-110, 140], C_ACCENT], ["cadera_der", [60, 130], C_ACCENT], ["cadera_izq", [140, 130], C_ACCENT],
+           ["pierna_der", [230, 140], C_SHELL], ["pierna_der", [230, 60], C_SHELL],
+           ["pierna_izq", [320, 140], C_SHELL], ["pierna_izq", [320, 60], C_SHELL],
+           ["tobillo_der", [60, 220], C_ACCENT], ["tobillo_izq", [150, 220], C_ACCENT],
+           ["pie_der", [250, 260], C_SHELL], ["pie_izq", [340, 260], C_SHELL],
+           ["tapa_servo", [-200, 140], C_ACCENT]]
+        : [["base", [-110, 120], C_SHELL], ["base_tapa", [110, 120], C_ACCENT]];
+    for (p = inferior) translate([p[1][0], p[1][1], 0]) color(p[2]) imprimir(p[0]);
+    lista = [["torso", [-110, -40], C_SHELL], ["cabeza", [80, -30], C_SHELL],
              ["cara", [260, -30], C_SHELL], ["cuello", [-250, -40], C_ACCENT],
              ["cuello_tapa", [-250, 40], C_ACCENT],
              ["hombro_der", [-40, -170], C_ACCENT], ["hombro_izq", [0, -170], C_ACCENT],
