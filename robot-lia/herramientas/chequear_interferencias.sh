@@ -41,16 +41,28 @@ chequear brazo_cabeza -70 155,0,110
 chequear piernas_servos 0
 for a in -15 0 15; do chequear cadera_pelvis "$a"; done
 for a in -30 0 45 90; do chequear muslo_cadera "$a"; done
-for a in 0 60 110; do chequear tibia_muslo "$a"; done
+for a in 0 60 100; do chequear tibia_muslo "$a"; done
 for a in -30 0 30; do chequear tobillo_tibia "$a"; done
 for a in -20 0 20; do chequear pie_tobillo "$a"; done
 # una pierna contra la otra: de pie, agachada, paso y peso cargado a un lado
 chequear piernas_entre_si 0 0,0,0 0,15,30,15,0 0,15,30,15,0
-chequear piernas_entre_si 0 0,0,0 0,60,110,50,0 0,60,110,50,0
+chequear piernas_entre_si 0 0,0,0 0,70,100,30,0 0,70,100,30,0
 chequear piernas_entre_si 0 0,0,0 0,40,70,30,0 0,-20,0,20,0
 chequear piernas_entre_si 0 0,0,0 -10,15,30,15,10 10,15,30,15,-10
 chequear piernas_entre_si 0 0,0,0 -15,40,70,30,15 15,-20,0,20,-15
-chequear pierna_cuerpo 0 0,0,0 15,90,110,0,0
+chequear pierna_cuerpo 0 0,0,0 15,90,100,10,0
+# la cadera ancha no debe tocar la pierna ni el brazo colgando
+chequear pierna_pelvis 0 0,0,0 0,15,30,15,0
+chequear pierna_pelvis 0 0,0,0 15,15,30,15,-15
+chequear pierna_pelvis 0 0,0,0 -15,15,30,15,15
+chequear pierna_pelvis 0 0,0,0 0,90,100,10,0
+chequear pierna_pelvis 0 0,0,0 0,-30,0,30,0
+chequear pierna_pelvis 0 0,0,0 0,70,100,30,0
+chequear pierna_pelvis 0 0,0,0 10,50,80,30,-10
+chequear brazo_pelvis 0 0,0,0
+chequear brazo_pelvis 0 30,0,0
+chequear brazo_pelvis 0 0,25,0
+chequear brazo_pelvis 0 80,20,40
 
 rm -rf "$TMP"
 echo "Choques: $fallas"

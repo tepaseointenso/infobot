@@ -38,7 +38,7 @@ module ensamble() {
     if (VARIANTE == "patas") {
         translate([0, 0, -Z_SUELO]) {
             cuerpo_superior();
-            color(C_ACCENT) pelvis();
+            color(C_SHELL) pelvis();
             pierna_ensamble(pierna_izq[0], pierna_izq[1], pierna_izq[2], pierna_izq[3], pierna_izq[4], mostrar_servos);
             mirror([1, 0, 0]) pierna_ensamble(pierna_der[0], pierna_der[1], pierna_der[2], pierna_der[3], pierna_der[4], mostrar_servos);
         }
@@ -100,7 +100,7 @@ module imprimir(p) {
 // Todas las piezas en orientacion de impresion, para revisar de un vistazo.
 module piezas() {
     inferior = VARIANTE == "patas"
-        ? [["pelvis", [-110, 140], C_ACCENT], ["cadera_der", [60, 130], C_ACCENT], ["cadera_izq", [140, 130], C_ACCENT],
+        ? [["pelvis", [-150, 150], C_SHELL], ["cadera_der", [40, 150], C_ACCENT], ["cadera_izq", [130, 150], C_ACCENT],
            ["pierna_der", [230, 140], C_SHELL], ["pierna_der", [230, 60], C_SHELL],
            ["pierna_izq", [320, 140], C_SHELL], ["pierna_izq", [320, 60], C_SHELL],
            ["tobillo_der", [60, 220], C_ACCENT], ["tobillo_izq", [150, 220], C_ACCENT],

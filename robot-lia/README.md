@@ -2,6 +2,8 @@
 
 Lia es un robot social humanoide inspirado en [Abi de Andromeda Robotics](https://andromedarobotics.ai/): cara amable con ojos en pantalla, cabeza que gira y asiente, brazos expresivos para saludar o abrazar y dos piernas con las que se para, se agacha, cambia el peso de pie y da pasos lentos. No es una copia de Abi. Es un diseño propio de unos 64 cm, pensado para imprimirse en una impresora doméstica de 220 × 220 mm y armarse con servos de hobby.
 
+La silueta es la de una mujer: el pecho mide 150 mm, la cintura se estrecha a 138 mm y la cadera vuelve a abrirse hasta 212 mm, con los muslos saliendo por debajo. El ancho extra está en los costados, no en una falda, así que las piernas siguen teniendo su recorrido.
+
 <p align="center">
   <img src="imagenes/lia_frente.png" width="24%" alt="Lia de frente">
   <img src="imagenes/lia_saludo.png" width="24%" alt="Lia saludando">
@@ -12,6 +14,7 @@ Lia es un robot social humanoide inspirado en [Abi de Andromeda Robotics](https:
 | | |
 |---|---|
 | Altura | ~643 mm de pie |
+| Pecho / cintura / cadera | 150 / 138 / 212 mm |
 | Ancho con brazos | 270 mm |
 | Grados de libertad | 18 (cuello pan/tilt, 3 por brazo, 5 por pierna) |
 | Servos | 10 × DS3218MG (piernas), 4 × MG996R, 4 × MG90S |
@@ -59,11 +62,11 @@ Cada servo queda en un alojamiento con la medida exacta del cuerpo. En el torso,
 |---|---|---|---|---|
 | 16 / 8 | `roll_cad` (abrir pierna) | DS3218MG | `pelvis` → `cadera` | −15 … 15 |
 | 17 / 9 | `cadera` (muslo adelante/atrás) | DS3218MG | `cadera` → muslo | −30 … 90 |
-| 18 / 10 | `rodilla` | DS3218MG | muslo → tibia | 0 … 110 |
+| 18 / 10 | `rodilla` | DS3218MG | muslo → tibia | 0 … 100 |
 | 19 / 11 | `tobillo` (punta arriba/abajo) | DS3218MG | tibia → `tobillo` | −30 … 30 |
 | 20 / 12 | `roll_tob` (inclinar pie) | DS3218MG | `tobillo` → `pie` | −20 … 20 |
 
-El muslo y la tibia son la misma pieza (`pierna`), de 75 mm entre ejes. Para que el pie quede plano basta con `tobillo = rodilla − cadera` y `roll_tob = −roll_cad`; las poses del firmware ya cumplen esa regla.
+El muslo y la tibia son la misma pieza (`pierna`), de 75 mm entre ejes. Para que el pie quede plano basta con `tobillo = rodilla − cadera` y `roll_tob = −roll_cad`; las poses del firmware ya cumplen esa regla. La rodilla no pasa de 100°: un poco más arriba el muslo y la tibia se tocan.
 
 Las cargas están calculadas con las piezas macizas, que es el peor caso. Con 20 a 40 % de relleno pesan menos. Arriba, el MG996R entrega ~10 kg·cm y el MG90S ~2 kg·cm a 6 V, con margen de 3× a más de 10×. En las piernas, el caso crítico es la rodilla con Lia apoyada en un solo pie y la rodilla flexionada: unos 11 kg·cm sobre un DS3218 de 20 kg·cm. Por eso las piernas no usan MG996R, que con 10 kg·cm reales quedaría al límite.
 
@@ -95,7 +98,7 @@ Las piezas de `stl/` ya están orientadas: importa y lamina. Configuración base
 | `hombro_der` / `hombro_izq` | 1 + 1 | 40 % | no | |
 | `brazo_der` / `brazo_izq` | 1 + 1 | 40 % | no | |
 | `antebrazo_der` / `antebrazo_izq` | 1 + 1 | 30 % | no | |
-| `pelvis` | 1 | 30 % | no | cara superior en la cama |
+| `pelvis` | 1 | 30 % | sí, tipo árbol | cara superior en la cama; el soporte va bajo los bulbos de la cadera |
 | `cadera_der` / `cadera_izq` | 1 + 1 | 40 % | sí, solo en la cama | apoyada sobre la cara trasera |
 | `pierna_der` / `pierna_izq` | 2 + 2 | 40 % | sí, bajo el travesaño | muslo y tibia son la misma pieza |
 | `tobillo_der` / `tobillo_izq` | 1 + 1 | 40 % | no | de pie |

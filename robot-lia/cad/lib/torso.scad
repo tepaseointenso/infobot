@@ -10,7 +10,12 @@ module en_hombros() {
 
 module torso_exterior() {
     hull() {
-        rbox_z([-TORSO_W / 2, -TORSO_D / 2, Z_T0], [TORSO_W / 2, TORSO_D / 2, Z_T - TORSO_CH], TORSO_R);
+        if (VARIANTE == "patas")
+            rbox_z([-WAIST_W / 2, -TORSO_D / 2, Z_T0], [WAIST_W / 2, TORSO_D / 2, Z_T0 + 0.2], WAIST_R);
+        else
+            rbox_z([-TORSO_W / 2, -TORSO_D / 2, Z_T0], [TORSO_W / 2, TORSO_D / 2, Z_T0 + 0.2], TORSO_R);
+        rbox_z([-TORSO_W / 2, -TORSO_D / 2, VARIANTE == "patas" ? Z_CINTURA : Z_T0],
+               [TORSO_W / 2, TORSO_D / 2, Z_T - TORSO_CH], TORSO_R);
         rbox_z([-TORSO_W / 2 + TORSO_CH, -TORSO_D / 2 + TORSO_CH, Z_T - 0.01],
                [TORSO_W / 2 - TORSO_CH, TORSO_D / 2 - TORSO_CH, Z_T], max(TORSO_R - TORSO_CH, 1));
     }
@@ -20,7 +25,13 @@ module torso_interior() {
     t = WALL;
     ins = TORSO_CH - 0.586 * t;
     hull() {
-        rbox_z([-TORSO_W / 2 + t, -TORSO_D / 2 + t, Z_T0 - 1],
+        if (VARIANTE == "patas")
+            rbox_z([-WAIST_W / 2 + t, -TORSO_D / 2 + t, Z_T0 - 1],
+                   [WAIST_W / 2 - t, TORSO_D / 2 - t, Z_T0], max(WAIST_R - t, 1));
+        else
+            rbox_z([-TORSO_W / 2 + t, -TORSO_D / 2 + t, Z_T0 - 1],
+                   [TORSO_W / 2 - t, TORSO_D / 2 - t, Z_T0], max(TORSO_R - t, 1));
+        rbox_z([-TORSO_W / 2 + t, -TORSO_D / 2 + t, VARIANTE == "patas" ? Z_CINTURA : Z_T0],
                [TORSO_W / 2 - t, TORSO_D / 2 - t, Z_T - TORSO_CH - 0.414 * t], TORSO_R - t);
         rbox_z([-TORSO_W / 2 + t + ins, -TORSO_D / 2 + t + ins, Z_T - t - 0.01],
                [TORSO_W / 2 - t - ins, TORSO_D / 2 - t - ins, Z_T - t], max(TORSO_R - t - ins, 1));

@@ -55,7 +55,7 @@ BASE_PLATE_T = 3;
 // ---------------------------------------------------------------------------
 //  Torso
 // ---------------------------------------------------------------------------
-TORSO_W  = 150;
+TORSO_W  = 150;    // pecho
 TORSO_D  = 110;
 TORSO_R  = 28;     // radio de esquinas en planta
 TORSO_CH = 20;     // chaflan superior a 45 grados (se imprime boca abajo sin soportes)
@@ -63,6 +63,11 @@ Z_T0     = BASE_H;
 Z_T      = 240;    // cara superior del torso
 Z_S      = Z_T - 42;   // altura del eje de los hombros
 TORSO_BOSS = [[52, 42], [-52, 42], [52, -42], [-52, -42]];
+// Cintura, solo variante patas: el pecho sigue en TORSO_W y la base se estrecha.
+// La cadera vuelve a abrirse debajo. Asi la silueta se lee como la de una mujer.
+WAIST_W   = 138;
+WAIST_R   = 26;
+Z_CINTURA = Z_T0 + 54;
 
 // ---------------------------------------------------------------------------
 //  Cuello (pan + tilt)
@@ -141,6 +146,16 @@ EAR_R   = 18;                                 // radio del disco de las orejas
 
 LEG_X   = 45;             // separacion de cada pierna respecto al centro
 PELV_T  = 8;              // espesor de la placa pelvis
+// Cadera: cresta a los costados, mas ancha que la cintura. 212 mm entra
+// en una cama de 220 mm sin brim. Poco espesor en Y: de perfil no hay bulbo.
+HIP_W       = 212;        // ancho de la cresta, de bulbo a bulbo
+// Hueco por el que se mueve el mecanismo de cada pierna. Tiene que quedar
+// dentro de la piel (HIP_W) y fuera del barrido del servo de roll.
+HUECO_W = 102;
+HUECO_D = 100;
+HUECO_Y = -4;
+HUECO_Z0 = 0;
+HUECO_Z1 = 70;   // el roll a +15 grados sube el bloque hasta z~70
 PELV_LIBRE = 29;          // eje roll de cadera -> cara inferior de la pelvis
 Z_HIP   = Z_T0 - PELV_T - PELV_LIBRE;
 CAD_DZ  = BLK_D / 2 + EAR_R + 1;             // roll de cadera -> pitch de cadera

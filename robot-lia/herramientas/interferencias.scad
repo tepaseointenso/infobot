@@ -101,3 +101,13 @@ else if (caso == "pierna_cuerpo")
         pierna_ensamble(pi[0], pi[1], pi[2], pi[3], pi[4], false);
         union() { torso(); brazo_ensamble(0, 0, 0, false); }
     }
+else if (caso == "pierna_pelvis")
+    intersection() {
+        pelvis();
+        pierna_ensamble(pi[0], pi[1], pi[2], pi[3], pi[4], false);
+    }
+else if (caso == "brazo_pelvis")
+    intersection() {
+        pelvis();
+        brazo_ensamble(brazo[0], brazo[1], brazo[2], false);
+    }

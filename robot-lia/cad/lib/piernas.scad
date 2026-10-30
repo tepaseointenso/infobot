@@ -146,35 +146,67 @@ module pie() {
 }
 
 // ---------------------------------------------------------------------------
-//  Pelvis (coordenadas globales): tapa inferior del torso, lleva la electronica
-//  arriba y las horquillas de las caderas abajo.
+//  Pelvis (coordenadas globales): tapa inferior del torso, electronica arriba,
+//  horquillas de roll abajo y la cadera ancha de la silueta.
 // ---------------------------------------------------------------------------
 module en_caderas() {
     translate([LEG_X, 0, Z_HIP]) children();
     mirror([1, 0, 0]) translate([LEG_X, 0, Z_HIP]) children();
 }
 
+module elipsoide(r) scale(r) sphere(r = 1);
+
+// La cadera se marca a los lados: nace en la cintura y se cierra sobre el muslo.
+// Poco espesor en Y para que de perfil no aparezca un bulbo suelto.
+module caderas_forma() {
+    rx = HIP_W / 2 - 90;
+    for (sx = [-1, 1]) hull() {
+        translate([sx * 64, 0, 77]) cube([10, 36, 5], center = true);
+        translate([sx * 90, 0, 50]) elipsoide([rx, 18, 22]);
+    }
+}
+
+// Hueco de una pierna. Arriba es un poco mas chico para no romper la piel.
+module hueco_pierna(sgn = 1) {
+    hull() {
+        translate([sgn * LEG_X, HUECO_Y, HUECO_Z0]) cube([HUECO_W, HUECO_D, 1], center = true);
+        translate([sgn * LEG_X, HUECO_Y, HUECO_Z1]) cube([HUECO_W - 10, HUECO_D - 14, 1], center = true);
+    }
+}
+
 module pelvis() {
     z0 = Z_T0 - PELV_T;
     difference() {
         union() {
-            rbox_z([-TORSO_W / 2, -TORSO_D / 2, z0], [TORSO_W / 2, TORSO_D / 2, Z_T0], TORSO_R);
-            en_caderas() en_horquilla_roll(CAD_YF) horquilla_pos(PELV_LIBRE + 1);
+            rbox_z([-WAIST_W / 2, -TORSO_D / 2, z0], [WAIST_W / 2, TORSO_D / 2, Z_T0], WAIST_R);
+            caderas_forma();
         }
-        en_caderas() en_horquilla_roll(CAD_YF) horquilla_neg();
         // tornillos M3 hacia los bujes del torso, cabeza por debajo
-        for (p = TORSO_BOSS) translate([p.x, p.y, z0 - 1]) {
-            cylinder(d = 3.4, h = PELV_T + 2);
-            cylinder(d = 6.5, h = 4);
+        for (p = TORSO_BOSS) {
+            translate([p.x, p.y, z0 - 1]) {
+                cylinder(d = 3.4, h = PELV_T + 2);
+                cylinder(d = 6.5, h = 4);
+            }
+            translate([p.x, p.y, 24]) cylinder(d = 8, h = z0 - 24);
         }
-        // paso de cables de cada pierna
-        for (sx = [-1, 1]) translate([sx * LEG_X, 0, z0 - 1]) rbox_z([-11, -8, 0], [11, 8, PELV_T + 2], 4);
+        // paso de cables de cada pierna, abierto a traves de la cadera
+        for (sx = [-1, 1]) {
+            translate([sx * LEG_X, 0, z0 - 1]) rbox_z([-11, -8, 0], [11, 8, PELV_T + 2], 4);
+            translate([sx * LEG_X, 0, 24]) rbox_z([-11, -8, 0], [11, 8, z0 - 22], 4);
+        }
         // 2 x PCA9685 apilados (separadores M2.5 de nylon)
         for (x = [-55.9 / 2, 55.9 / 2], y = [-19 / 2, 19 / 2]) translate([x, y - 30, z0 + 2]) cylinder(d = 2.2, h = PELV_T);
         // bridas: ESP32 (centro), regulador (lado derecho), bateria 2S (atras)
         for (p = [[-20, -16], [20, -16], [-20, 16], [20, 16], [58, -12], [58, -32], [-58, -12], [-58, -32]])
-            translate([p.x - 2, p.y - 1.5, z0 - 1]) cube([4, 3, PELV_T + 2]);
-        for (sx = [-1, 1]) translate([sx * 53 - 1.5, 22, z0 - 1]) cube([3, 13, PELV_T + 2]);
+            translate([p.x - 2, p.y - 1.5, 24]) cube([4, 3, z0 - 22]);
+        for (sx = [-1, 1]) translate([sx * 53 - 1.5, 22, 24]) cube([3, 13, z0 - 22]);
+        hueco_pierna(1);
+        hueco_pierna(-1);
+    }
+    // Despues del hueco: si no, el vaciado se lleva las orejas del roll.
+    en_caderas() en_horquilla_roll(CAD_YF) difference() {
+        horquilla_pos(PELV_LIBRE + 1);
+        horquilla_neg();
     }
 }
 

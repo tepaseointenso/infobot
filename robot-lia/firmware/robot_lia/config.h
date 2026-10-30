@@ -96,12 +96,13 @@ static const ConfigArticulacion CONFIG_ART[N_ART] = {
   // DS3218 de 180 grados (para la version de 270 grados usar 7.41 us/grado)
   { "roll_cad_der",  16,    0,   -15,   15,    0,  false, 11.11,  40 },
   { "cadera_der",    17,   30,   -30,   90,    0,  false, 11.11,  60 },
-  { "rodilla_der",   18,   55,     0,  110,    0,  false, 11.11,  60 },
+  // Por encima de ~105 grados el muslo y la tibia se tocan.
+  { "rodilla_der",   18,   55,     0,  100,    0,  false, 11.11,  60 },
   { "tobillo_der",   19,    0,   -30,   30,    0,  false, 11.11,  60 },
   { "roll_tob_der",  20,    0,   -20,   20,    0,  false, 11.11,  40 },
   { "roll_cad_izq",   8,    0,   -15,   15,    0,  true,  11.11,  40 },
   { "cadera_izq",     9,   30,   -30,   90,    0,  true,  11.11,  60 },
-  { "rodilla_izq",   10,   55,     0,  110,    0,  true,  11.11,  60 },
+  { "rodilla_izq",   10,   55,     0,  100,    0,  true,  11.11,  60 },
   { "tobillo_izq",   11,    0,   -30,   30,    0,  true,  11.11,  60 },
   { "roll_tob_izq",  12,    0,   -20,   20,    0,  true,  11.11,  40 },
 #endif
