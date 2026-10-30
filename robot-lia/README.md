@@ -5,10 +5,16 @@ Lia es un robot social humanoide inspirado en [Abi de Andromeda Robotics](https:
 La silueta es la de una mujer: el pecho mide 150 mm, la cintura se estrecha a 138 mm y la cadera vuelve a abrirse hasta 212 mm, con los muslos saliendo por debajo. El ancho extra está en los costados, no en una falda, así que las piernas siguen teniendo su recorrido.
 
 <p align="center">
-  <img src="imagenes/lia_frente.png" width="24%" alt="Lia de frente">
-  <img src="imagenes/lia_saludo.png" width="24%" alt="Lia saludando">
-  <img src="imagenes/lia_paso.png" width="24%" alt="Lia dando un paso">
-  <img src="imagenes/lia_trasera.png" width="24%" alt="Lia por detrás">
+  <img src="imagenes/lia_frente.png" width="23%" alt="Lia de frente">
+  <img src="imagenes/lia_cadera.png" width="23%" alt="Lia con los brazos arriba: la cadera queda más ancha que la cintura">
+  <img src="imagenes/lia_tres_cuartos.png" width="23%" alt="Lia en tres cuartos">
+  <img src="imagenes/lia_trasera.png" width="23%" alt="Lia por detrás">
+</p>
+<p align="center">
+  <img src="imagenes/lia_saludo.png" width="23%" alt="Lia saludando">
+  <img src="imagenes/lia_paso.png" width="23%" alt="Lia dando un paso">
+  <img src="imagenes/lia_agachada.png" width="23%" alt="Lia agachada">
+  <img src="imagenes/lia_perfil.png" width="23%" alt="Lia de perfil">
 </p>
 
 | | |
