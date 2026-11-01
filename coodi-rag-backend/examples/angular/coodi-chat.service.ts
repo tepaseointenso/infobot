@@ -68,8 +68,8 @@ export class CoodiChatService {
           signal: controller.signal,
         });
         if (!res.ok || !res.body) {
-          const detail = await res.text();
-          throw new Error(`Error ${res.status}: ${detail}`);
+          const body = await res.json().catch(() => ({}));
+          throw new Error(body.detail ?? `Error ${res.status}`);
         }
 
         const reader = res.body.getReader();
@@ -83,9 +83,9 @@ export class CoodiChatService {
           while ((sep = buffer.indexOf('\n\n')) >= 0) {
             const block = buffer.slice(0, sep);
             buffer = buffer.slice(sep + 2);
-            const event = block.match(/^event: (.*)$/m)?.[1];
+            const type = block.match(/^event: (.*)$/m)?.[1];
             const data = JSON.parse(block.match(/^data: (.*)$/m)?.[1] ?? '{}');
-            this.zone.run(() => subscriber.next({ type: event, ...data } as ChatStreamEvent));
+            this.zone.run(() => subscriber.next({ type, ...data } as ChatStreamEvent));
           }
         }
         this.zone.run(() => subscriber.complete());

@@ -1,18 +1,20 @@
 # Coodi RAG Backend
 
-Backend RAG (Retrieval-Augmented Generation) para el asistente de **coodi.cl**: un asistente de robótica
-educativa para profesores que trabajan con el robot **Coodi**. Responde solo con el material que ustedes
-carguen (manuales, guías docentes, planificaciones, fichas, diagramas, fotos), citando la fuente de cada
-respuesta.
+Backend RAG (Retrieval-Augmented Generation) en **Node.js + Express + TypeScript** para el asistente de
+**coodi.cl**: un asistente de robótica educativa para profesores que trabajan con el robot **Coodi**.
+Responde solo con el material que ustedes carguen (manuales, guías docentes, planificaciones, fichas,
+diagramas, fotos) y cita la fuente de cada respuesta.
 
-- **FastAPI** (Python 3.12), API REST + streaming (Server-Sent Events) para el frontend Angular.
-- **PDF**: extrae el texto por página, las **imágenes incrustadas** (diagramas, fotos del robot, capturas
-  de bloques) y las **páginas escaneadas** sin texto, que se transcriben con un modelo de visión.
+- **API REST + streaming** (Server-Sent Events) para el frontend Angular.
+- **PDF** (con [MuPDF](https://mupdf.com/), sin dependencias nativas): extrae el texto por página, las
+  **imágenes incrustadas** (diagramas, fotos del robot, capturas de bloques) y las **páginas escaneadas**
+  sin texto, que se transcriben con un modelo de visión.
 - **Imágenes** (png/jpg/webp/gif): se describen con un modelo de visión (textos visibles, componentes,
   pines, colores de cables, bloques de código) y esa descripción se indexa. Se puede agregar una
   descripción manual (`caption`).
 - **.txt / .md** también se aceptan.
-- **Qdrant** como base vectorial: embebido (sin servidores extra) o servidor Qdrant en producción.
+- **Base vectorial**: SQLite local por defecto (sin servicios extra) o **Qdrant** para producción con mucho
+  contenido.
 - Proveedor de IA **compatible con OpenAI** (OpenAI, Ollama, vLLM, Groq, etc.) configurable por variables
   de entorno. Proveedor `fake` sin conexión para pruebas.
 - Las respuestas incluyen las **fuentes** (documento, página, fragmento y URL de la imagen) para que el
@@ -21,37 +23,37 @@ respuesta.
 
 ```
 coodi-rag-backend/
-├── app/
-│   ├── main.py            # App FastAPI, CORS, /media, /health
-│   ├── config.py          # Configuración (variables de entorno / .env)
-│   ├── prompts.py         # Prompt de sistema del asistente Coodi y prompts de visión
-│   ├── rag.py             # Ingesta, recuperación y generación
-│   ├── llm.py             # Proveedores de IA (OpenAI-compatible y fake)
-│   ├── vectorstore.py     # Qdrant
-│   ├── registry.py        # Catálogo SQLite de documentos
-│   ├── ingestion/         # Extracción de PDF/imágenes y chunking
-│   └── api/               # Endpoints /api/chat y /api/documents
-├── scripts/ingest.py      # Carga masiva de una carpeta
-├── examples/angular/      # Servicio Angular listo para copiar
+├── src/
+│   ├── server.ts            # Punto de entrada
+│   ├── app.ts               # App Express, CORS, /media, /health
+│   ├── config.ts            # Configuración (variables de entorno / .env)
+│   ├── prompts.ts           # Prompt de sistema del asistente Coodi y prompts de visión
+│   ├── rag.ts               # Ingesta, recuperación y generación
+│   ├── llm.ts               # Proveedores de IA (OpenAI-compatible y fake)
+│   ├── ingestion/           # Extracción de PDF/imágenes y chunking
+│   ├── store/               # Catálogo de documentos y base vectorial (SQLite / Qdrant)
+│   ├── routes/              # /api/chat y /api/documents
+│   └── scripts/ingest.ts    # Carga masiva de una carpeta
+├── examples/angular/        # Servicio Angular listo para copiar
 └── tests/
 ```
 
 ## Puesta en marcha
 
+Requiere Node.js 22 o superior.
+
 ```bash
 cd coodi-rag-backend
-python3 -m venv .venv && source .venv/bin/activate
-pip install -r requirements-dev.txt
+npm install
 cp .env.example .env        # completa OPENAI_API_KEY y ADMIN_API_KEY
-uvicorn app.main:app --reload --port 8000
+npm run dev                 # http://localhost:8000 con recarga automática
 ```
 
-Documentación interactiva (Swagger): http://localhost:8000/docs
-
-Con Docker (incluye servidor Qdrant):
+Producción:
 
 ```bash
-cp .env.example .env
+npm run build && npm start
+# o con Docker (incluye servidor Qdrant):
 docker compose up -d --build
 ```
 
@@ -80,10 +82,10 @@ curl -H "X-API-Key: $ADMIN_API_KEY" -H "Content-Type: application/json" \
   -d '{"query":"¿cómo conecto el sensor de distancia?"}' http://localhost:8000/api/documents/search
 ```
 
-Carga masiva de una carpeta (con el servidor detenido si usan Qdrant embebido):
+Carga masiva de una carpeta (con la base local, detengan el servidor antes):
 
 ```bash
-python -m scripts.ingest ./material-coodi --tags curso-basico
+npm run ingest -- ./material-coodi --tags curso-basico
 ```
 
 Los archivos duplicados (mismo contenido) se detectan y no se vuelven a indexar.
@@ -94,12 +96,12 @@ quieren filtrar por nivel o curso desde el frontend.
 
 ## API para el frontend Angular
 
-| Método | Ruta                    | Descripción                                   |
-|--------|-------------------------|-----------------------------------------------|
-| POST   | `/api/chat`             | Respuesta completa con fuentes                |
-| POST   | `/api/chat/stream`      | Respuesta en streaming (SSE)                  |
-| GET    | `/media/...`            | Imágenes de las fuentes                       |
-| GET    | `/health`               | Estado y número de documentos/fragmentos      |
+| Método | Ruta               | Descripción                              |
+|--------|--------------------|------------------------------------------|
+| POST   | `/api/chat`        | Respuesta completa con fuentes           |
+| POST   | `/api/chat/stream` | Respuesta en streaming (SSE)             |
+| GET    | `/media/...`       | Imágenes de las fuentes                  |
+| GET    | `/health`          | Estado y número de documentos/fragmentos |
 
 Request:
 
@@ -135,20 +137,22 @@ una imagen o diagrama) o `page_ocr` (página escaneada); en los dos últimos `im
 
 `/api/chat/stream` emite eventos `sources` (una vez, al inicio), `token` (texto incremental), `done` o
 `error`. El historial lo mantiene el frontend y se envía en cada request (el backend no guarda sesiones).
+Los errores responden JSON con `{"detail": "..."}` (400 imagen inválida, 422 datos inválidos, etc.).
 
 En [`examples/angular/coodi-chat.service.ts`](examples/angular/coodi-chat.service.ts) hay un servicio
 Angular listo para copiar, con `ask()` (HTTP normal) y `askStream()` (streaming), más un ejemplo de uso.
-Recuerden agregar el dominio del frontend a `CORS_ORIGINS` y configurar `PUBLIC_BASE_URL` con la URL
-pública del backend para que las imágenes de las fuentes carguen.
+Agreguen el dominio del frontend a `CORS_ORIGINS` y configuren `PUBLIC_BASE_URL` con la URL pública del
+backend para que las imágenes de las fuentes carguen.
 
 ## Personalizar el asistente
 
-- `app/prompts.py`: personalidad, reglas y alcance del asistente (solo Coodi, robótica educativa y
+- `src/prompts.ts`: personalidad, reglas y alcance del asistente (solo Coodi, robótica educativa y
   docencia; responde en español; no inventa; cita fuentes).
 - `TOP_K` / `MIN_SCORE`: cuántos fragmentos se usan y el umbral de relevancia. Si responde "no encuentro"
   con contenido que sí existe, bajen `MIN_SCORE`; si mezcla temas, súbanlo.
 - `CHUNK_SIZE` / `CHUNK_OVERLAP`: tamaño de los fragmentos. Si cambian `EMBEDDING_MODEL` a uno con otra
-  dimensión, ajusten `EMBEDDING_DIM`, cambien `COLLECTION` y vuelvan a cargar el material.
+  dimensión, ajusten `EMBEDDING_DIM` y vuelvan a cargar el material en una base nueva (`DATA_DIR` o
+  `COLLECTION` distintos).
 
 ## Producción
 
@@ -156,12 +160,14 @@ pública del backend para que las imágenes de las fuentes carguen.
   en el frontend Angular (la carga de contenido debe hacerse desde un panel interno o por script).
 - `/api/chat` es público para el frontend: pongan el backend detrás de un proxy (nginx, Cloud Run, etc.)
   con HTTPS y límite de solicitudes por IP para controlar costos del modelo.
-- Respaldar el volumen de datos (`/data`: catálogo SQLite e imágenes) y el de Qdrant.
+- La base local (SQLite) busca de forma exacta en memoria y funciona bien hasta decenas de miles de
+  fragmentos; con más contenido usen Qdrant (`QDRANT_URL`, ya configurado en `docker-compose.yml`).
+- Respalden el volumen de datos (`/data`: base SQLite e imágenes) y el de Qdrant si lo usan.
 
 ## Tests
 
 ```bash
-pytest
+npm test
 ```
 
 Los tests usan el proveedor `fake`, por lo que no requieren API key ni conexión.
